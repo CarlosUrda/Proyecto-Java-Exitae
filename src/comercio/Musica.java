@@ -62,7 +62,7 @@ public abstract class Musica implements Serializable
 	 * Función encargada de escribir los objetos Musica de memoria a un archivo.
 	 * @param nombreArchivo Nombre del archivo de donde escribir los objetos Musica
 	 * @return Ninguno.
-s	 * @throws IOException cualquier otro error en la lectura del archivo
+	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
 	public static void guardarMusicas( String nombreArchivo) throws IOException
 	{
