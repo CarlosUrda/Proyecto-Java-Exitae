@@ -57,7 +57,7 @@ public class GestionTiendas
 		// Se obtienen las tiendas guardadas en la base de datos.
 		try
 		{
-			Tienda.cargarTiendas( GestionTiendas.nombreArchivoTiendas);
+			Tienda.cargarBD( GestionTiendas.nombreArchivoTiendas);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -76,7 +76,7 @@ public class GestionTiendas
 		// Se guardan las tiendas.
 		try
 		{
-			GestionTiendas.guardarTiendas( GestionTiendas.nombreArchivoTiendas);
+			Tienda.guardarBD( GestionTiendas.nombreArchivoTiendas);
 		}
 		catch (FileNotFoundException e)
 		{

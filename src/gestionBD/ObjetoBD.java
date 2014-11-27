@@ -8,7 +8,7 @@ package gestionBD;
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-public interface DatoObjeto 
+public interface ObjetoBD 
 {
 	public int obtenerId();
 }

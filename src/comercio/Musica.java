@@ -4,23 +4,23 @@
 package comercio;
 
 import gestionBD.BD;
-import gestionBD.DatoObjeto;
+import gestionBD.ObjetoBD;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * Clase Musica que representa un producto de música genñerico (CD, Vinilo, Casette, etc)
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-public abstract class Musica implements Serializable, DatoObjeto
+public abstract class Musica implements Serializable, ObjetoBD
 {
+	private static final long serialVersionUID = 1L;
 	private static int idGeneral = 1;
-	private static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos
+	protected static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos
 	
 	private int id;			  // Id del producto en la base de datos.
 	private String nombre;	  // Nombre del producto
@@ -34,7 +34,7 @@ public abstract class Musica implements Serializable, DatoObjeto
 	 * @param codigo Codigo único (estilo código de barras) del producto.
 	 * @param precio Precio base del producto.
 	 */
-	public Musica( String nombre, String codigo, float precio)
+	protected Musica( String nombre, String codigo, float precio)
 	{
 		this.nombre = nombre;
 		this.codigo = codigo;
@@ -52,7 +52,7 @@ public abstract class Musica implements Serializable, DatoObjeto
 	 * @throws IOException Cualquier otro error en la lectura del archivo
 	 * @throws FileNotFoundException Si no se encuentra el archivo con nombreArchivo
 	 */
-	public static void cargar( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
+	public static void cargarBD( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Musica.lista = BD.leerObjetos( nombreArchivo);
 	}
@@ -64,7 +64,7 @@ public abstract class Musica implements Serializable, DatoObjeto
 	 * @return Ninguno.
 	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
-	public static void guardar( String nombreArchivo) throws IOException
+	public static void guardarBD( String nombreArchivo) throws IOException
 	{
 		BD.escribirObjetos( nombreArchivo, Musica.lista);
 	}
@@ -89,9 +89,27 @@ public abstract class Musica implements Serializable, DatoObjeto
 	 */
 	public static Musica buscar( int id)
 	{
-		return BD.buscar( Musica.lista, id);
+		return BD.buscarObjeto( Musica.lista, id);
 	}
 
+
+	/**
+	 * Sobrecarga de método equals para comparar objetos Musica
+	 * @param musica Musica a comparar
+	 * @return Si el objeto es de tipo Musica devuelve true si coincide el codigo,
+	 * sino devuelve false; Si el objeto no es de tipo Musica, devuelve directamente
+	 * el resultado de la comparación de las referencias a los objetos
+	 */
+	@Override
+	public boolean equals( Object musica)
+	{
+		if (musica instanceof Musica)
+			return this.codigo.equalsIgnoreCase( ((Musica)musica).obtenerCodigo());
+		
+		return this == musica;
+	}
+
+	
 	/**
 	 * Obtener el Id del objeto Musica
 	 * @return Id
@@ -102,6 +120,16 @@ public abstract class Musica implements Serializable, DatoObjeto
 	}
 
 
+	/**
+	 * Obtener el codigo del objeto Musica
+	 * @return Precio base
+	 */
+	public String obtenerCodigo()
+	{
+		return this.codigo;
+	}
+
+	
 	/**
 	 * Obtener el precio base del objeto Musica
 	 * @return Precio base

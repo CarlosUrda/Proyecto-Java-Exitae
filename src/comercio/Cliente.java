@@ -4,7 +4,7 @@
 package comercio;
 
 import gestionBD.BD;
-import gestionBD.DatoObjeto;
+import gestionBD.ObjetoBD;
 
 import java.io.EOFException;
 import java.io.FileInputStream;
@@ -23,8 +23,9 @@ import java.util.Iterator;
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-public class Cliente implements Serializable, DatoObjeto 
+public class Cliente implements Serializable, ObjetoBD 
 {
+	private static final long serialVersionUID = 1L;
 	private static int idGeneral = 1;
 	private static ArrayList<Cliente> lista;	// Lista de objetos Cliente cargados en memoria desde la base de datos.
 	
@@ -37,11 +38,8 @@ public class Cliente implements Serializable, DatoObjeto
 	 * Constructor
 	 * @param nombre Nombre del Cliente
 	 * @param dni Dni del Cliente.
-	 * @param email Correo electrónico del Cliente.
-	 * @param telefono Teléfono del Cliente.
-	 * @param numSocio Número de socio en la cadena de tiendas.
 	 */
-	public Cliente( String nombre, String dni, String email, int telefono, int numSocio)
+	private Cliente( String nombre, String dni)
 	{
 		this.nombre = nombre;
 		this.dni = dni;
@@ -50,15 +48,15 @@ public class Cliente implements Serializable, DatoObjeto
 
 
 	/**
-	 * Función encargada de leer los objetos Musica grabados en un archivo y guardarlos
-	 * como una lista interna.
+	 * Función encargada de leer los objetos Cliente grabados en un archivo
+	 * y cargarlos en una lista en memoria.
 	 * @param nombreArchivo Nombre del archivo de donde leer los objetos Musica
 	 * @return Ninguno.
 	 * @throws ClassNotFoundException Si no se encuentra ningún objeto Musica
 	 * @throws IOException Cualquier otro error en la lectura del archivo
 	 * @throws FileNotFoundException Si no se encuentra el archivo con nombreArchivo
 	 */
-	public static void cargar( String nombreArchivo) 
+	public static void cargarBD( String nombreArchivo) 
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Cliente.lista = BD.leerObjetos( nombreArchivo);
@@ -71,7 +69,7 @@ public class Cliente implements Serializable, DatoObjeto
 	 * @return Ninguno.
 	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
-	public static void guardar( String nombreArchivo) throws IOException
+	public static void guardarBD( String nombreArchivo) throws IOException
 	{
 		BD.escribirObjetos( nombreArchivo, Cliente.lista);
 	}
@@ -96,9 +94,43 @@ public class Cliente implements Serializable, DatoObjeto
 	 */
 	public static Cliente buscar( int id)
 	{
-		return BD.buscar( Cliente.lista, id);
+		return BD.buscarObjeto( Cliente.lista, id);
 	}
 
+	
+	/**
+	 * Registrar un cliente en la base de datos de clientes en memoria
+	 * @param nombre Nombre del Cliente.
+	 * @param dni Dni del Cliente.
+	 * @throws ObjetoExisteExcepcion Si ya existe un Cliente con estos datos
+	 */
+	public static void registrar( String nombre, String dni) throws ObjetoExisteExcepcion
+	{
+		// Se comprueba si el cliente ya existe
+		Cliente cliente = new Cliente( nombre, dni);
+		if (Cliente.lista.contains( cliente))
+			throw new ObjetoExisteExcepcion( "Ya existe un cliente con estos datos."); 
+		
+		Cliente.lista.add( cliente);
+	}
+	
+	
+	/**
+	 * Sobrecarga de método equals para comparar objetos Cliente
+	 * @param cliente Objeto a comparar
+	 * @return Si el objeto es de tipo Cliente devuelve true si coincide el dni,
+	 * sino devuelve false; Si el objeto no es de tipo Cliente, devuelve directamente
+	 * el resultado de la comparación de las referencias a los objetos
+	 */
+	@Override
+	public boolean equals( Object cliente)
+	{
+		if (cliente instanceof Cliente)
+			return this.dni.equalsIgnoreCase( ((Cliente)cliente).obtenerDni());
+		
+		return this == cliente;
+	}
+	
 	
 	/**
 	 * Obtener el Id del objeto Musica

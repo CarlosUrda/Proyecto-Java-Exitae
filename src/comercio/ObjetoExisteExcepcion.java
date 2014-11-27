@@ -2,16 +2,16 @@ package comercio;
 import java.lang.Exception;
 
 /**
- * Excepción que informa de la inexistencia de un cliente en el registro.
+ * Excepción que informa si un objeto ya está registrado en la base de datos.
  * un pago.
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-public class ClienteNoEncontradoExcepcion extends Exception 
+public class ObjetoExisteExcepcion extends Exception 
 {
 	private static final long serialVersionUID = 1L;
 
-	public ClienteNoEncontradoExcepcion( String mensaje)
+	public ObjetoExisteExcepcion( String mensaje)
 	{
 		super( mensaje);
 	}

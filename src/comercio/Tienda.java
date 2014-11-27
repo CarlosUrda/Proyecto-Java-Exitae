@@ -3,27 +3,21 @@
  */
 package comercio;
 import gestionBD.BD;
-import gestionBD.DatoObjeto;
+import gestionBD.ObjetoBD;
 import excepcionesGenericas.*;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 
 
 /**
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-public class Tienda implements Serializable, DatoObjeto
+public class Tienda implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
 	private static int idGeneral = 1;
@@ -49,7 +43,7 @@ public class Tienda implements Serializable, DatoObjeto
 	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @throws FileNotFoundException Si no se encuentra el archivo con nombreArchivo
 	 */
-	public static void cargar( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
+	public static void cargarBD( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Tienda.lista = BD.leerObjetos( nombreArchivo);
 	}
@@ -61,7 +55,7 @@ public class Tienda implements Serializable, DatoObjeto
 	 * @return Ninguno.
 s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
-	public static void guardar( String nombreArchivo) throws IOException
+	public static void guardarBD( String nombreArchivo) throws IOException
 	{
 		BD.escribirObjetos( nombreArchivo, Tienda.lista);
 	}
@@ -76,7 +70,24 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	{
 		return Tienda.lista;
 	}
-
+	
+	
+	/**
+	 * Registrar un producto Tieda en la base de datos de tiendas en memoria
+	 * @param nombre Nombre de la Tienda.
+	 * @param cif Cif de la Tienda.
+	 * @paraç deudaLimite Límite base de crédito a cada cliente
+	 * @throws ObjetoExisteExcepcion Si ya existe una Tienda con estos datos
+	 */
+	public static void registrar( String nombre, String cif, float deudaLimite) throws ObjetoExisteExcepcion
+	{
+		// Se comprueba si la Tienda ya existe
+		Tienda tienda = new Tienda( nombre, cif, deudaLimite);
+		if (Tienda.lista.contains( tienda))
+			throw new ObjetoExisteExcepcion( "Ya existe una tienda con estos datos."); 
+		
+		Tienda.lista.add( tienda);
+	}
 	
 	
 	/**
@@ -85,7 +96,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @param cif Cif de la Tienda
 	 * @param deudaLimite Deuda límite para cada cliente.
 	 */
-	public Tienda( String nombre, String cif, float deudaLimite)
+	private Tienda( String nombre, String cif, float deudaLimite)
 	{
 		this.id = Tienda.idGeneral++;
 		this.nombre = nombre;
@@ -93,6 +104,33 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		this.deudaLimite = deudaLimite;
 	}
 
+	
+	/**
+	 * Sobrecarga de método equals para comparar objetos Tienda
+	 * @param tienda Tienda a comparar
+	 * @return Si el objeto es de tipo Tienda devuelve true si coincide el codigo,
+	 * sino devuelve false; Si el objeto no es de tipo Tienda, devuelve directamente
+	 * el resultado de la comparación de las referencias a los objetos
+	 */
+	@Override
+	public boolean equals( Object tienda)
+	{
+		if (tienda instanceof Tienda)
+			return this.cif.equalsIgnoreCase( ((Tienda)tienda).obtenerCif());
+		
+		return this == tienda;
+	}
+
+	
+	/**
+	 * Obtener el valor del Cif de la Tienda
+	 * @return Id de la venta
+	 */
+	public String obtenerCif()
+	{
+		return this.cif;
+	}
+	
 	
 	/**
 	 * Obtener el valor del Id de la Tienda
@@ -144,14 +182,14 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * no tenía cuenta en esta Tienda, se crea con el saldo inicial.
 	 * @param idCliente Id del Cliente registrado
 	 * @param dinero Dinero a modificar del saldo en la cuenta del cliente.
-	 * @throws ClienteNoEncontradoExcepcion El Cliente no está registrado.
+	 * @throws ObjetoNoEncontradoExcepcion El Cliente no está registrado.
 	 */
-	public void cuentaCliente( int idCliente, float dinero) throws ClienteNoEncontradoExcepcion
+	public void cuentaCliente( int idCliente, float dinero) throws ObjetoNoEncontradoExcepcion
 	{
 		// Se comprueba la existencia del objeto Cliente
 		Cliente cliente = Cliente.buscar( idCliente);
 		if (cliente == null)
-			throw new ClienteNoEncontradoExcepcion( "El cliente con id " + idCliente + " no está registrado");
+			throw new ObjetoNoEncontradoExcepcion( "El cliente con id " + idCliente + " no está registrado");
 
 		// Se comprueba si el cliente ya dispone de una cuenta en esta Tienda.
 		InfoCliente infoCliente = this.buscarInfoCliente( idCliente);
@@ -168,15 +206,16 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @param idMusica Id del producto Musica a incorporar
 	 * @param stock Número de productos adquiridos.
 	 * @throws StockInsuficienteExcepcion Si no hay stock suficiente para extraer.
-	 * @throws MusicaNoEncontradaExcepcion Si no existe ningún objeto Musica con el idMusica.
+	 * @throws ObjetoNoEncontradaExcepcion Si no existe ningún objeto Musica registrado 
+	 *  con el idMusica.
 	 */
 	public void stockMusica( int idMusica, int stock) 
-			throws StockInsuficienteExcepcion, MusicaNoEncontradaExcepcion
+			throws StockInsuficienteExcepcion, ObjetoNoEncontradoExcepcion
 	{
 		// Se comprueba la existencia del objeto Musica
 		Musica musica = Musica.buscar( idMusica);
 		if (musica == null)
-			throw new MusicaNoEncontradaExcepcion( "El objeto música con id " + idMusica + " no existe");
+			throw new ObjetoNoEncontradoExcepcion( "El objeto música con id " + idMusica + " no existe");
 
 		// Se comprueba si el objeto Musica ha sido anteriormente adquirido por la Tienda.
 		InfoMusica infoMusica = this.buscarInfoMusica(idMusica);
@@ -200,7 +239,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
 	private InfoMusica buscarInfoMusica( int idMusica)
 	{
-		return BD.buscar( this.listaInfoMusica, idMusica);
+		return BD.buscarObjeto( this.listaInfoMusica, idMusica);
 	}
 	
 	
@@ -212,7 +251,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
 	private InfoCliente buscarInfoCliente( int idCliente)
 	{
-		return BD.buscar( this.listaInfoCliente, idCliente);
+		return BD.buscarObjeto( this.listaInfoCliente, idCliente);
 	}
 
 	
@@ -221,7 +260,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @author Carlos A. Gómez Urda
 	 * @version 1.0
 	 */
-	private class InfoMusica implements DatoObjeto
+	private class InfoMusica implements ObjetoBD
 	{
 		private Integer idMusica;   // Id del objeto Musica
 		private Integer stock;   	// Número de productos idMusica disponibles en stock.
@@ -306,7 +345,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @author Carlos A. Gómez Urda
 	 * @version 1.0
 	 */
-	private class InfoCliente implements DatoObjeto
+	private class InfoCliente implements ObjetoBD
 	{
 		private int idCliente;      // Id del objeto Cliente.
 		private float saldo;        // Dinero disponible por el cliente en la tienda.
