@@ -4,6 +4,7 @@
 package comercio;
 import menus.SistemaMenus;
 import menus.NoExisteMenuExcepcion;
+import gestionBD.BD;
 
 import java.util.ArrayList;
 import java.io.FileInputStream;
@@ -22,7 +23,8 @@ import java.io.ObjectOutputStream;
 public class GestionTiendas 
 {
 	// Nombre de archivo donde se guardan los datos de las tiendas.
-	private final static String nombreArchivoTiendas = "tiendas.txt";
+	private static String nombreArchivoTiendas = "tiendas.txt";
+
 	
 	/**
 	 * Creación de todo el sistema de menús de la gestión de tiendas.
@@ -41,7 +43,6 @@ public class GestionTiendas
 					   			 {"Salir", "Salir del programa", ""}};
 	}
 	
-	private static 
 	
 	
 	/**
@@ -50,10 +51,13 @@ public class GestionTiendas
 	 */
 	public static void main( String[] args) 
 	{
+		if (args.length > 0)
+			GestionTiendas.nombreArchivoTiendas = args[0];
+		
 		// Se obtienen las tiendas guardadas en la base de datos.
 		try
 		{
-			ArrayList<Tienda> tiendas = Tienda.leerTiendas( GestionTiendas.nombreArchivoTiendas);
+			Tienda.cargarTiendas( GestionTiendas.nombreArchivoTiendas);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -66,6 +70,24 @@ public class GestionTiendas
 			System.err.println( e.getMessage());			
 		}
 		
+		
+		
+		
+		// Se guardan las tiendas.
+		try
+		{
+			GestionTiendas.guardarTiendas( GestionTiendas.nombreArchivoTiendas);
+		}
+		catch (FileNotFoundException e)
+		{
+			System.err.println( "El archivo " + GestionTiendas.nombreArchivoTiendas + " no existe.");
+			System.err.println( e.getMessage());
+		}
+		catch (IOException e)
+		{
+			System.err.println( "Error al acceder al archivo " + GestionTiendas.nombreArchivoTiendas);
+			System.err.println( e.getMessage());			
+		}
 		
 	}
 

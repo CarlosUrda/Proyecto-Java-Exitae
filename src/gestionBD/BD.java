@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import comercio.Cliente;
+
 
 /**
  * Clase para el acceso genérico a los datos de archivos.
@@ -65,5 +67,30 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		
 		while (iterator.hasNext())
 			archivo.writeObject( iterator.next());
+		
+		archivo.close();
+	}
+	
+	
+	/**
+	 * Buscar un objeto T con un id determinado dentro de una lista de objetos 
+	 * @param lista Lista de objetos donde buscar. 
+	 * @param id Id del objeto a buscar
+	 * @return Objeto encontrado. Si no se encuentra devuelve null.
+	 */
+	public static <T> T buscar( ArrayList<T> lista, int id)
+	{
+		Iterator<T> iterator = lista.iterator();
+		T objeto;
+		
+		while (iterator.hasNext())
+		{
+			objeto = iterator.next();
+			if (((DatoObjeto) objeto).obtenerId() == id)
+				return objeto;
+		}
+		
+		return null;
+		
 	}
 }
