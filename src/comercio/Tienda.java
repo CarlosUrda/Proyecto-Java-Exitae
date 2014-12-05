@@ -46,6 +46,7 @@ public class Tienda implements Serializable, ObjetoBD
 	public static void cargarBD( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Tienda.lista = BD.leerObjetos( nombreArchivo);
+		Tienda.idGeneral = Tienda.lista.get( Tienda.lista.size()-1).id + 1;
 	}
 	
 	

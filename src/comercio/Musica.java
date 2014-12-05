@@ -55,6 +55,7 @@ public abstract class Musica implements Serializable, ObjetoBD
 	public static void cargarBD( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Musica.lista = BD.leerObjetos( nombreArchivo);
+		Musica.idGeneral = Musica.lista.get( Musica.lista.size()-1).id + 1;
 	}
 	
 	
