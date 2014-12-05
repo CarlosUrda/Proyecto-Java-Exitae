@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+// SOLICIONAR LA SIGNACIÓN DE ID'S, QUE NO FUNCIONA BIEN.
 
 /**
  * Gestión de un sistema de Tiendas

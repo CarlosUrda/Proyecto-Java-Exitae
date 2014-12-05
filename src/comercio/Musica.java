@@ -94,6 +94,21 @@ public abstract class Musica implements Serializable, ObjetoBD
 
 
 	/**
+	 * Eliminar una Musica de la base de datos de músicas en memoria
+	 * @param id Id de la Musica a eliminar
+	 * @throws ObjetoNoEncontradoExcepcion Si no hay ninguna Musica con el id.
+	 */
+	public static void eliminar( int id) throws ObjetoNoEncontradoExcepcion
+	{
+		Musica musica = Musica.buscar( id);
+		if (musica == null)
+			throw new ObjetoNoEncontradoExcepcion( "La musica con id " + id + " no existe");
+
+		Musica.lista.remove( musica);
+	}
+	
+	
+	/**
 	 * Sobrecarga de método equals para comparar objetos Musica
 	 * @param musica Musica a comparar
 	 * @return Si el objeto es de tipo Musica devuelve true si coincide el codigo,

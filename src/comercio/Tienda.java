@@ -53,7 +53,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * Función encargada de escribir los objetos Tienda de memoria en un archivo.
 	 * @param nombreArchivo Nombre del archivo de donde escribir los objetos Tienda
 	 * @return Ninguno.
-s	 * @throws IOException cualquier otro error en la lectura del archivo
+	 * @throws IOException cualquier otro error en la lectura del archivo
 	 */
 	public static void guardarBD( String nombreArchivo) throws IOException
 	{
@@ -73,7 +73,22 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	
 	
 	/**
-	 * Registrar un producto Tieda en la base de datos de tiendas en memoria
+	 * Constructor
+	 * @param nombre Nombre de la Tienda
+	 * @param cif Cif de la Tienda
+	 * @param deudaLimite Deuda límite para cada cliente.
+	 */
+	private Tienda( String nombre, String cif, float deudaLimite)
+	{
+		this.id = Tienda.idGeneral++;
+		this.nombre = nombre;
+		this.cif = cif;
+		this.deudaLimite = deudaLimite;
+	}
+
+	
+	/**
+	 * Registrar una Tienda en la base de datos de tiendas en memoria
 	 * @param nombre Nombre de la Tienda.
 	 * @param cif Cif de la Tienda.
 	 * @paraç deudaLimite Límite base de crédito a cada cliente
@@ -91,17 +106,29 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	
 	
 	/**
-	 * Constructor
-	 * @param nombre Nombre de la Tienda
-	 * @param cif Cif de la Tienda
-	 * @param deudaLimite Deuda límite para cada cliente.
+	 * Eliminar una Tienda de la base de datos de tiendas en memoria
+	 * @param id Id de la tienda a eliminar
+	 * @throws ObjetoNoEncontradoExcepcion Si no hay ninguna tienda con el id.
 	 */
-	private Tienda( String nombre, String cif, float deudaLimite)
+	public static void eliminar( int id) throws ObjetoNoEncontradoExcepcion
 	{
-		this.id = Tienda.idGeneral++;
-		this.nombre = nombre;
-		this.cif = cif;
-		this.deudaLimite = deudaLimite;
+		Tienda tienda = Tienda.buscar( id);
+		if (tienda == null)
+			throw new ObjetoNoEncontradoExcepcion( "La tienda con id " + id + " no existe");
+
+		Tienda.lista.remove( tienda);
+	}
+	
+	
+	/**
+	 * Buscar un objeto Tienda con un id determinado dentro de la lista de objetos 
+	 * cargadas actualmente en memoria a partir del archivo. 
+	 * @param id
+	 * @return Objeto Tienda encontrado. Si no se encuentra devuelve null.
+	 */
+	public static Tienda buscar( int id)
+	{
+		return BD.buscarObjeto( Tienda.lista, id);
 	}
 
 	
@@ -151,8 +178,11 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @param SaldoInsuficienteExcepcion Si el cliente no puede realizar el pago con su cuenta.
 	 */
 	public void realizarVenta( int idMusica, int idCliente, int numProductos) 
-			throws StockInsuficienteExcepcion, SaldoInsuficienteExcepcion
+			throws StockInsuficienteExcepcion, SaldoInsuficienteExcepcion, ArgumentoInvalidoExcepcion
 	{
+		if (numProductos < 0)
+			throw new ArgumentoInvalidoExcepcion( "El número de productos debe ser positivo");
+		
 		// Se comprueba si existe stock la Musica en la Tienda.
 		InfoMusica infoMusica = this.buscarInfoMusica( idMusica);
 		if ((infoMusica == null) || (infoMusica.comprobarStock( numProductos) == false))
@@ -183,8 +213,9 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	 * @param idCliente Id del Cliente registrado
 	 * @param dinero Dinero a modificar del saldo en la cuenta del cliente.
 	 * @throws ObjetoNoEncontradoExcepcion El Cliente no está registrado.
+	 * @throws SaldoInsuficienteExcepcion Si la variación de la cuenta sobrepasa la deuda permitida
 	 */
-	public void cuentaCliente( int idCliente, float dinero) throws ObjetoNoEncontradoExcepcion
+	public void cuentaCliente( int idCliente, float dinero) throws ObjetoNoEncontradoExcepcion, SaldoInsuficienteExcepcion
 	{
 		// Se comprueba la existencia del objeto Cliente
 		Cliente cliente = Cliente.buscar( idCliente);
@@ -284,9 +315,13 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		 * Comprobar si hay suficiente stock para una cantidad de productos solicitada
 		 * @param stock Cantidad a comprobar si existe en stock.
 		 * @return true si hay stock, false si no hay stock para esa cantidad solicitada.
+		 * @throws ArgumentoInvalidoExcepcion Si el numProductos es negativo.
 		 */
-		public boolean comprobarStock( int numProductos)
+		public boolean comprobarStock( int numProductos) throws ArgumentoInvalidoExcepcion
 		{
+			if (numProductos < 0)
+				throw new ArgumentoInvalidoExcepcion( "El número de productos no puede ser negativo");
+
 			return (this.stock - numProductos) >= 0;
 		}
 		
@@ -298,8 +333,10 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		 */
 		public void variarStock( int stock) throws StockInsuficienteExcepcion
 		{
-			if ((stock < 0) && (this.comprobarStock( -stock) == false))
-				throw new StockInsuficienteExcepcion( "No hay suficiente stock en la tienda.");
+			try {				
+				if ((stock < 0) && (this.comprobarStock( -stock) == false))
+					throw new StockInsuficienteExcepcion( "No hay suficiente stock en la tienda.");
+			} catch (ArgumentoInvalidoExcepcion e) {}
 			
 			this.stock += stock;
 		}
@@ -365,8 +402,18 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		
 		
 		/**
+		 * Bloquear o desboquear la cuenta
+		 * @param bloquear true o false si se desea bloquear la cuenta o no
+		 */
+		public void cambiarBloqueo( boolean bloquear)
+		{
+			this.bloqueada = bloquear;
+		}
+		
+		
+		/**
 		 * Comprobar si el cliente puede realizar un pago.
-		 * @param pago
+		 * @param pago Dinero a comprobar si se puede afrontar en la cuenta del cliente
 		 * @return null si puede realizar el pago; Mensaje de error si no puede realizarlo.
 		 */
 		public String comprobarPago( float pago)
@@ -387,23 +434,32 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		 * @param pago Pago a descontar de la cuenta del cliente
 		 * @throws SaldoInsuficienteExcepcion Si no hay dinero en la cuenta para
 		 * poder realizar el pago.
+		 * @throws ArgumentoInvalidoExcepcion Si el valor del pago es negativo
 		 */
-		public void realizarPago( float pago) throws SaldoInsuficienteExcepcion
+		public void realizarPago( float pago) throws SaldoInsuficienteExcepcion, ArgumentoInvalidoExcepcion
 		{
-			String estado = this.comprobarPago( pago);
-			if (estado != null)
-				throw new SaldoInsuficienteExcepcion( estado);
+			if (pago < 0)
+				throw new ArgumentoInvalidoExcepcion( "El valor del pago no puede ser negativo");
 
-			this.saldo -= pago;
+			variarSaldo( -pago);
 		}
 		
 		
 		/**
 		 * Ingresar o extraer dinero en la cuenta del cliente
 		 * @param dinero Dinero a ingresar o extraer en la cuenta del cliente
+		 * @throws SaldoInsuficienteExcepcion Si no hay dinero en la cuenta para
+		 * afrontar el límite de la deuda.
 		 */
-		public void variarSaldo( float dinero)
+		public void variarSaldo( float dinero)  throws SaldoInsuficienteExcepcion
 		{
+			if (dinero < 0)
+			{				
+				String estado = this.comprobarPago( -dinero);
+				if (estado != null)
+					throw new SaldoInsuficienteExcepcion( estado);
+			}
+
 			this.saldo += dinero;
 		}		
 
@@ -427,7 +483,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */
-class Venta implements Serializable
+class Venta implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
 
@@ -454,7 +510,7 @@ class Venta implements Serializable
 		this.idCliente = idCliente;
 		this.numProductos = numProductos;
 		this.id = Venta.idGeneral++;
-		this.precio = precio;
+		this.precio = precio;			// Precio de una unida del producto de la venta
 		this.fecha = new GregorianCalendar();
 	}
 	
@@ -470,11 +526,11 @@ class Venta implements Serializable
 	
 	
 	/**
-	 * Obtener el precio al que se vendió el producto.
+	 * Obtener el gasto de la venta.
 	 * @return Precio al que se vendió el producto.
 	 */
-	public float obtenerPrecio()
+	public float obtenerGasto()
 	{
-		return this.precio;
+		return this.precio * this.numProductos;
 	}
 }
