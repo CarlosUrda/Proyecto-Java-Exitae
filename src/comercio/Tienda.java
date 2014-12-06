@@ -19,10 +19,10 @@ import java.util.GregorianCalendar;
 public class Tienda implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
-	private static int idGeneral = 1;
+	private static Integer idGeneral = 1;
 	private static ArrayList<Tienda> lista;   // Lista de tiendas totales cargadas de la base de datos.	
 	
-	private int id;					// Nº identificación de la tienda
+	private Integer id;					// Nº identificación de la tienda
 	private String nombre;			// Nombre de la tienda
 	private String cif;				// CIF de la tienda
 	private ArrayList<Tienda.InfoMusica> listaInfoMusica;
@@ -91,10 +91,11 @@ public class Tienda implements Serializable, ObjetoBD
 	 * Registrar una Tienda en la base de datos de tiendas en memoria
 	 * @param nombre Nombre de la Tienda.
 	 * @param cif Cif de la Tienda.
-	 * @paraç deudaLimite Límite base de crédito a cada cliente
+	 * @param deudaLimite Límite base de crédito a cada cliente
+	 * @return Tienda registrada.
 	 * @throws ObjetoExisteExcepcion Si ya existe una Tienda con estos datos
 	 */
-	public static void registrar( String nombre, String cif, float deudaLimite) throws ObjetoExisteExcepcion
+	public static Tienda registrar( String nombre, String cif, float deudaLimite) throws ObjetoExisteExcepcion
 	{
 		// Se comprueba si la Tienda ya existe
 		Tienda tienda = new Tienda( nombre, cif, deudaLimite);
@@ -102,6 +103,7 @@ public class Tienda implements Serializable, ObjetoBD
 			throw new ObjetoExisteExcepcion( "Ya existe una tienda con estos datos."); 
 		
 		Tienda.lista.add( tienda);
+		return tienda;
 	}
 	
 	
@@ -110,7 +112,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @param id Id de la tienda a eliminar
 	 * @throws ObjetoNoEncontradoExcepcion Si no hay ninguna tienda con el id.
 	 */
-	public static void eliminar( int id) throws ObjetoNoEncontradoExcepcion
+	public static void eliminar( Integer id) throws ObjetoNoEncontradoExcepcion
 	{
 		Tienda tienda = Tienda.buscar( id);
 		if (tienda == null)
@@ -126,7 +128,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @param id
 	 * @return Objeto Tienda encontrado. Si no se encuentra devuelve null.
 	 */
-	public static Tienda buscar( int id)
+	public static Tienda buscar( Integer id)
 	{
 		return BD.buscarObjeto( Tienda.lista, id);
 	}
@@ -143,7 +145,7 @@ public class Tienda implements Serializable, ObjetoBD
 	public boolean equals( Object tienda)
 	{
 		if (tienda instanceof Tienda)
-			return this.cif.equalsIgnoreCase( ((Tienda)tienda).obtenerCif());
+			return this.cif.equalsIgnoreCase( ((Tienda)tienda).cif);
 		
 		return this == tienda;
 	}
@@ -177,7 +179,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @param StockInsuficienteExcepcion Si no hay stock del producto para poder hacer la venta.
 	 * @param SaldoInsuficienteExcepcion Si el cliente no puede realizar el pago con su cuenta.
 	 */
-	public void realizarVenta( int idMusica, int idCliente, int numProductos) 
+	public void realizarVenta( Integer idMusica, Integer idCliente, Integer numProductos) 
 			throws StockInsuficienteExcepcion, SaldoInsuficienteExcepcion, ArgumentoInvalidoExcepcion
 	{
 		if (numProductos < 0)
@@ -215,7 +217,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @throws ObjetoNoEncontradoExcepcion El Cliente no está registrado.
 	 * @throws SaldoInsuficienteExcepcion Si la variación de la cuenta sobrepasa la deuda permitida
 	 */
-	public void cuentaCliente( int idCliente, float dinero) throws ObjetoNoEncontradoExcepcion, SaldoInsuficienteExcepcion
+	public void cuentaCliente( Integer idCliente, float dinero) throws ObjetoNoEncontradoExcepcion, SaldoInsuficienteExcepcion
 	{
 		// Se comprueba la existencia del objeto Cliente
 		if (Cliente.buscar( idCliente) == null)
@@ -231,15 +233,15 @@ public class Tienda implements Serializable, ObjetoBD
 	
 	
 	/**
-	 * Método encargado de incorporar a la Tienda un nuevo producto con un determinado
-	 * stock. Si el producto ya se encuentra en la Tienda, se modifica el stock.
+	 * Método encargado de variar el stock de un producto en la Tienda. Si el producto no
+	 * se encuentra en la Tienda, se incorpora con el stock dado.
 	 * @param idMusica Id del producto Musica a incorporar
 	 * @param stock Número de productos adquiridos.
 	 * @throws StockInsuficienteExcepcion Si no hay stock suficiente para extraer.
 	 * @throws ObjetoNoEncontradaExcepcion Si no existe ningún objeto Musica registrado 
 	 *  con el idMusica.
 	 */
-	public void stockMusica( int idMusica, int stock) 
+	public void stockMusica( Integer idMusica, Integer stock) 
 			throws StockInsuficienteExcepcion, ObjetoNoEncontradoExcepcion
 	{
 		// Se comprueba la existencia del objeto Musica
@@ -252,22 +254,70 @@ public class Tienda implements Serializable, ObjetoBD
 		if (infoMusica == null)
 		{
 			if (stock < 0)
-				throw new StockInsuficienteExcepcion( "No se puede incorporar un producto con stock negativo");
+				throw new StockInsuficienteExcepcion( "El producto no se encuentra en la Tienda.");
 			
 			this.listaInfoMusica.add( this.new InfoMusica( idMusica, stock, musica.obtenerPrecio()));
 		}
 		else
-			infoMusica.variarStock( stock);		
+			infoMusica.variarStock( stock);
 	}
 	
+	
+	/**
+	 * Eliminar los datos del producto Musica dentro de esta Tienda en el caso de
+	 * no tener stock.
+	 * @param idMusica Id del producto Musica a limpiar de la Tienda.
+	 * @param destruir True si se desea eliminar la información del producto en la
+	 * Tienda sin importar su stock. False para eliminar sólo en el caso de tener 
+	 * stock cero en la Tienda.
+	 * @return False si el producto tenía stock. True si se ha limpiado los datos del
+	 * producto en esta Tienda.
+	 */
+	public boolean eliminarMusica( Integer idMusica, boolean destruir)
+	{
+		InfoMusica infoMusica = this.buscarInfoMusica( idMusica);
+		if (infoMusica != null)
+		{
+			if (infoMusica.hayStock() && !destruir)
+				return false;
+			else
+				this.listaInfoMusica.remove( infoMusica);
+		}
+		
+		return true;
+	}
 
+	
+	/**
+	 * Eliminar los datos de la cuenta de un Cliente dentro de esta Tienda.
+	 * @param idCliente Id del Cliente a eliminar su cuenta.
+	 * @param destruir True si se desea eliminar la cuenta sin importar su saldo 
+	 * o si está bloqueada. False para eliminar sólo en el caso de no estar 
+	 * boqueada y su saldo está a cero.
+	 * @return False si la cuenta no se ha borrado. True si se ha borrado.
+	 */
+	public boolean eliminarCuentaCliente( Integer idCliente, boolean destruir)
+	{
+		InfoCliente infoCliente = this.buscarInfoCliente( idCliente);
+		if (infoCliente != null)
+		{
+			if ((infoCliente.bloqueado() || (infoCliente.obtenerSaldo() != 0)) && !destruir)
+				return false;
+			else
+				this.listaInfoCliente.remove( infoCliente);
+		}
+		
+		return true;
+	}
+
+	
 	/**
 	 * Método encargado de buscar, en la lista de musicas adquiridos a disposición
 	 * en la Tienda, alguno con un id de Musica concreto.
 	 * @param idMusica Id del objeto Musica a buscar.
 	 * @return Objeto InfoMusica encontrado o null si la tienda no lo ha adquirido
 	 */
-	private InfoMusica buscarInfoMusica( int idMusica)
+	private InfoMusica buscarInfoMusica( Integer idMusica)
 	{
 		return BD.buscarObjeto( this.listaInfoMusica, idMusica);
 	}
@@ -279,7 +329,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @param idMusica Id del objeto Musica a buscar.
 	 * @return Objeto InfoMusica encontrado o null si la tienda no lo ha adquirido
 	 */
-	private InfoCliente buscarInfoCliente( int idCliente)
+	private InfoCliente buscarInfoCliente( Integer idCliente)
 	{
 		return BD.buscarObjeto( this.listaInfoCliente, idCliente);
 	}
@@ -316,7 +366,7 @@ public class Tienda implements Serializable, ObjetoBD
 		 * @return true si hay stock, false si no hay stock para esa cantidad solicitada.
 		 * @throws ArgumentoInvalidoExcepcion Si el numProductos es negativo.
 		 */
-		public boolean comprobarStock( int numProductos) throws ArgumentoInvalidoExcepcion
+		public boolean comprobarStock( Integer numProductos) throws ArgumentoInvalidoExcepcion
 		{
 			if (numProductos < 0)
 				throw new ArgumentoInvalidoExcepcion( "El número de productos no puede ser negativo");
@@ -326,11 +376,21 @@ public class Tienda implements Serializable, ObjetoBD
 		
 		
 		/**
+		 * Comprobar si hay stock
+		 * @return true si hay stock, false si no hay stock.
+		 */
+		public boolean hayStock()
+		{
+			return this.stock > 0;
+		}
+		
+		
+		/**
 		 * Cambiar el número de productos en stock del objeto Musica en la Tienda.
 		 * @param stock Número de productos a modificar en el stock de la tienda.
 		 * @throws StockInsuficienteExcepcion Si no hay stock suficiente
 		 */
-		public void variarStock( int stock) throws StockInsuficienteExcepcion
+		public void variarStock( Integer stock) throws StockInsuficienteExcepcion
 		{
 			try {				
 				if ((stock < 0) && (this.comprobarStock( -stock) == false))
@@ -373,6 +433,24 @@ public class Tienda implements Serializable, ObjetoBD
 		{
 			return this.precio;
 		}
+
+
+		/**
+		 * Sobrecarga de método equals para comparar objetos infoMusica
+		 * @param infoMusica infoMusica a comparar
+		 * @return Si el objeto es de tipo InfoMusica devuelve true si coincide el idMusica,
+		 * sino devuelve false; Si el objeto no es de tipo InfoMusica, devuelve directamente
+		 * el resultado de la comparación de las referencias a los objetos
+		 */
+		@Override
+		public boolean equals( Object infoMusica)
+		{
+			if (infoMusica instanceof InfoMusica)
+				return this.idMusica.equals( ((InfoMusica) infoMusica).idMusica);
+			
+			return this == infoMusica;
+		}
+
 	}
 
 
@@ -383,20 +461,20 @@ public class Tienda implements Serializable, ObjetoBD
 	 */
 	private class InfoCliente implements ObjetoBD
 	{
-		private int idCliente;      // Id del objeto Cliente.
+		private Integer idCliente;      // Id del objeto Cliente.
 		private float saldo;        // Dinero disponible por el cliente en la tienda.
-		private boolean bloqueada;  // Flag para saber si la cuenta está bloqueada.
+		private boolean bloqueado;  // Flag para saber si la cuenta está bloqueada.
 		
 		/**
 		 * Constructor
 		 * @param idCliente Id del Cliente
 		 * @param saldo Dinero a disponer en la Tienda.
 		 */
-		public InfoCliente( int idCliente, float saldo)
+		public InfoCliente( Integer idCliente, float saldo)
 		{
 			this.idCliente = idCliente;
 			this.saldo = saldo;
-			this.bloqueada = false;
+			this.bloqueado = false;
 		}
 		
 		
@@ -406,7 +484,7 @@ public class Tienda implements Serializable, ObjetoBD
 		 */
 		public void cambiarBloqueo( boolean bloquear)
 		{
-			this.bloqueada = bloquear;
+			this.bloqueado = bloquear;
 		}
 		
 		
@@ -417,7 +495,7 @@ public class Tienda implements Serializable, ObjetoBD
 		 */
 		public String comprobarPago( float pago)
 		{
-			if (this.bloqueada)
+			if (this.bloqueado)
 				return new String( "La cuenta está bloqueada.");
 
 			// Se comprueba si se puede realizar el pago
@@ -471,6 +549,44 @@ public class Tienda implements Serializable, ObjetoBD
 		{
 			return this.idCliente;
 		}
+
+
+		/**
+		 * Devolver el saldo del objeto Cliente. 
+		 * @return idMusica
+		 */
+		public float obtenerSaldo()
+		{
+			return this.saldo;
+		}
+
+		
+		/**
+		 * Informa si la cuenta de un cliente está bloqueada. 
+		 * @return idMusica
+		 */
+		public boolean bloqueado()
+		{
+			return this.bloqueado;
+		}
+
+		
+		/**
+		 * Sobrecarga de método equals para comparar objetos infoCliente
+		 * @param infoCliente InfoCliente a comparar
+		 * @return Si el objeto es de tipo InfoCliente devuelve true si coincide el idCliente,
+		 * sino devuelve false; Si el objeto no es de tipo InfoCliente, devuelve directamente
+		 * el resultado de la comparación de las referencias a los objetos
+		 */
+		@Override
+		public boolean equals( Object infoCliente)
+		{
+			if (infoCliente instanceof InfoCliente)
+				return this.idCliente.equals( ((InfoCliente) infoCliente).idCliente);
+			
+			return this == infoCliente;
+		}
+		
 	}
 	
 }
@@ -486,12 +602,12 @@ class Venta implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
 
-	private static int idGeneral = 1;
+	private static Integer idGeneral = 1;
 	
-	private int id;
-	private int idMusica;
-	private int idCliente;
-	private int numProductos; 			 // Número de productos vendidos en la venta.
+	private Integer id;
+	private Integer idMusica;
+	private Integer idCliente;
+	private Integer numProductos; 			 // Número de productos vendidos en la venta.
 	private float precio;                // Precio de cada unidad vendida.
 	private GregorianCalendar fecha;	 // Fecha de la venta.
 	
@@ -503,7 +619,7 @@ class Venta implements Serializable, ObjetoBD
 	 * @param numProductos Número de productos vendidos en la venta.
 	 * @param precio Precio de cada unidad vendida del producto Musica.
 	 */
-	public Venta( int idMusica, int idCliente, int numProductos, float precio)
+	public Venta( Integer idMusica, Integer idCliente, Integer numProductos, float precio)
 	{
 		this.idMusica = idMusica;
 		this.idCliente = idCliente;

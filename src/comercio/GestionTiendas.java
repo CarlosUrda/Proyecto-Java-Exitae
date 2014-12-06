@@ -2,17 +2,7 @@
  * 
  */
 package comercio;
-import menus.SistemaMenus;
-import menus.NoExisteMenuExcepcion;
-import gestionBD.BD;
-
-import java.util.ArrayList;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import menus.*;
 
 /**
  * Gestión de un sistema de Tiendas
@@ -28,7 +18,7 @@ public class GestionTiendas
 	/**
 	 * Creación de todo el sistema de menús de la gestión de tiendas.
 	 */
-	private static SistemaMenus crearMenus()
+	private static SistemaMenus crearMenus() throws NoExisteMenuExcepcion
 	{
 		// Se crean el menú principal.
 		SistemaMenus menu = new SistemaMenus( "MenuPrincipal", "Sistema de gestión de Tiendas - Menú principal");
@@ -40,11 +30,26 @@ public class GestionTiendas
 		menu.agregarMenu( subMenu);		
 
 		subMenu = new String[][]{{"RegistrarTienda", "Registro de nueva tienda", "Registra una nueva tienda."},
-								 {"EliminarTienda", "Eliminación de tienda", "Elimina una tienda existente"},
-					   			 {"ListarTiendas", "Listado de tiendas.", "Listado de todas las tiendas existentes."},
+								 {"EliminarTienda", "Eliminación de tienda", "Elimina una tienda registrada."},
+					   			 {"EditarTienda", "Edición de la tienda.", "Edición de una de las tiendas registradas."},
+					   			 {"ListarTiendas", "Listado de tiendas.", "Listado de todas las tiendas registradas."},
 					   			 {"Volver", "", "Volver al menú anterior."}};
-		menu.agregarMenu(datosMenu, indiceLocal);
+		menu.agregarMenu( subMenu, "GestionarTiendas");
 		
+		subMenu = new String[][]{{"RegistrarCliente", "Registro de un nuevo cliente.", "Registra un nuevo cliente en la cadena de tiendas."},
+								 {"EliminarCliente", "Eliminación de un cliente.", "Elimina un cliente ya registrado."},
+					   			 {"EditarCliente", "Edición del cliente.", "Edición de los datos de un cliente registrado."},
+					   			 {"ListarClientes", "Listado de clientes.", "Listado de todos los clientes registrados."},
+					   			 {"Volver", "", "Volver al menú anterior."}};
+		menu.agregarMenu( subMenu, "GestionarClientes");
+		
+		subMenu = new String[][]{{"RegistrarProducto", "Registro de un nuevo producto.", "Registra un nuevo producto en la cadena de tiendas."},
+								 {"EliminarProducto", "Eliminación de un producto.", "Elimina un producto registrado."},
+					   			 {"EditarCliente", "Edición del cliente.", "Edición de los datos de un cliente registrado."},
+					   			 {"ListarClientes", "Listado de clientes.", "Listado de todos los clientes registrados."},
+					   			 {"Volver", "", "Volver al menú anterior."}};
+		menu.agregarMenu( subMenu, "GestionarClientes");
+
 		return menu;
 	}
 	
@@ -63,6 +68,7 @@ public class GestionTiendas
 		try
 		{
 			Tienda.cargarBD( GestionTiendas.nombreArchivoTiendas);
+			GestionTiendas.crearMenus();
 		}
 		catch (Exception e)
 		{

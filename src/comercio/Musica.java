@@ -3,14 +3,14 @@
  */
 package comercio;
 
-import excepcionesGenericas.ObjetoNoEncontradoExcepcion;
-import gestionBD.BD;
-import gestionBD.ObjetoBD;
+import excepcionesGenericas.*;
+import gestionBD.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Clase Musica que representa un producto de música genñerico (CD, Vinilo, Casette, etc)
@@ -20,10 +20,10 @@ import java.util.ArrayList;
 public abstract class Musica implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
-	private static int idGeneral = 1;
+	private static Integer idGeneral = 1;
 	protected static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos
 	
-	private int id;			  // Id del producto en la base de datos.
+	private Integer id;			  // Id del producto en la base de datos.
 	private String nombre;	  // Nombre del producto
 	private String codigo;    // Código único del producto
 	private float precio;     // Precio base del producto.
@@ -89,24 +89,41 @@ public abstract class Musica implements Serializable, ObjetoBD
 	 * @param id
 	 * @return Objeto Musica encontrado. Si no se encuentra devuelve null.
 	 */
-	public static Musica buscar( int id)
+	public static Musica buscar( Integer id)
 	{
 		return BD.buscarObjeto( Musica.lista, id);
 	}
 
 
 	/**
-	 * Eliminar una Musica de la base de datos de músicas en memoria
+	 * Eliminar un producto Musica de la base de datos de músicas registradas. 
 	 * @param id Id de la Musica a eliminar
+	 * @param destruir True si se desea eliminar la información del producto en las
+	 * tiendas sin importar su stock. False para eliminar la información en las tiendas
+	 * sólo en el caso de tener stock cero.
 	 * @throws ObjetoNoEncontradoExcepcion Si no hay ninguna Musica con el id.
+	 * @return True si se ha eliminado el registro. False si no se ha podido eliminar debido
+	 * a la existencia de datos de este producto en las tiendas que no se han podido eliminar.
 	 */
-	public static void eliminar( int id) throws ObjetoNoEncontradoExcepcion
+	public static boolean eliminar( Integer id, boolean destruir) throws ObjetoNoEncontradoExcepcion
 	{
 		Musica musica = Musica.buscar( id);
 		if (musica == null)
 			throw new ObjetoNoEncontradoExcepcion( "La musica con id " + id + " no existe");
 
-		Musica.lista.remove( musica);
+		// Se elimina la información del producto en las tiendas.
+		ArrayList<Tienda> tiendas = Tienda.obtenerTiendas();
+		Iterator<Tienda> iterator = tiendas.iterator();
+		
+		boolean eliminado = true;  // Flag para saber si se ha eliminado toda la información del Cliente en las tiendas. 
+		while (iterator.hasNext())
+			 if ((iterator.next().eliminarMusica( id, destruir) == false) && eliminado)
+				 eliminado = false;
+		
+		if (eliminado)
+			Musica.lista.remove( musica);
+		
+		return eliminado;
 	}
 	
 	

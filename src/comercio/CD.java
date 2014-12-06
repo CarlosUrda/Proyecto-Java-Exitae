@@ -3,7 +3,7 @@
  */
 package comercio;
 
-import excepcionesGenericas.ObjetoExisteExcepcion;
+import excepcionesGenericas.*;
 
 /**
  * Clase que representa un objeto CD

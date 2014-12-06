@@ -3,17 +3,11 @@
  */
 package comercio;
 
-import excepcionesGenericas.ObjetoExisteExcepcion;
-import gestionBD.BD;
-import gestionBD.ObjetoBD;
+import excepcionesGenericas.*;
+import gestionBD.*;
 
-import java.io.EOFException;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,10 +21,10 @@ import java.util.Iterator;
 public class Cliente implements Serializable, ObjetoBD 
 {
 	private static final long serialVersionUID = 1L;
-	private static int idGeneral = 1;
+	private static Integer idGeneral = 1;
 	private static ArrayList<Cliente> lista;	// Lista de objetos Cliente cargados en memoria desde la base de datos.
 	
-	private int id;			  // Id del cliente en la base de datos.
+	private Integer id;			  // Id del cliente en la base de datos.
 	private String nombre;	  // Nombre del cliente
 	private String dni; 	  // DNI
 	
@@ -103,9 +97,10 @@ public class Cliente implements Serializable, ObjetoBD
 	 * Registrar un cliente en la base de datos de clientes en memoria
 	 * @param nombre Nombre del Cliente.
 	 * @param dni Dni del Cliente.
+	 * @return Cliente registrado.
 	 * @throws ObjetoExisteExcepcion Si ya existe un Cliente con estos datos
 	 */
-	public static void registrar( String nombre, String dni) throws ObjetoExisteExcepcion
+	public static Cliente registrar( String nombre, String dni) throws ObjetoExisteExcepcion
 	{
 		// Se comprueba si el cliente ya existe
 		Cliente cliente = new Cliente( nombre, dni);
@@ -113,6 +108,41 @@ public class Cliente implements Serializable, ObjetoBD
 			throw new ObjetoExisteExcepcion( "Ya existe un cliente con estos datos."); 
 		
 		Cliente.lista.add( cliente);
+		return cliente;
+	}
+	
+	
+	/**
+	 * Eliminar un registro de Cliente de la base de datos. 
+	 * @param id Id del Cliente a eliminar
+	 * @param destruir True si se desea eliminar las cuentas del cliente en las
+	 * tiendas sin importar su saldo y si está bloqueado. False para eliminar la 
+	 * cuenta de Cliente en las tiendas sólo en el caso de tener saldo cero y no 
+	 * estar bloqueado.
+	 * @throws ObjetoNoEncontradoExcepcion Si no hay ninguna Musica con el id.
+	 * @return True si se ha eliminado el registro. False si no se ha podido eliminar
+	 * debido a la existencia de datos de este cliente en las tiendas que no se han
+	 * podido eliminar.
+	 */
+	public static boolean eliminar( Integer id, boolean destruir) throws ObjetoNoEncontradoExcepcion
+	{
+		Cliente cliente = Cliente.buscar( id);
+		if (cliente == null)
+			throw new ObjetoNoEncontradoExcepcion( "El cliente con id " + id + " no existe");
+
+		// Se elimina la información del producto en las tiendas.
+		ArrayList<Tienda> tiendas = Tienda.obtenerTiendas();
+		Iterator<Tienda> iterator = tiendas.iterator();
+		
+		boolean eliminado = true;  // Flag para saber si se ha eliminado toda la información del Cliente en las tiendas. 
+		while (iterator.hasNext())
+			 if ((iterator.next().eliminarMusica( id, destruir) == false) && eliminado)
+				 eliminado = false;
+		
+		if (eliminado)
+			Cliente.lista.remove( cliente);
+		
+		return eliminado;
 	}
 	
 	
