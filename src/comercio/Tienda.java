@@ -2,8 +2,7 @@
  * 
  */
 package comercio;
-import gestionBD.BD;
-import gestionBD.ObjetoBD;
+import gestionBD.*;
 import excepcionesGenericas.*;
 
 import java.io.FileNotFoundException;
@@ -164,7 +163,7 @@ public class Tienda implements Serializable, ObjetoBD
 	 * Obtener el valor del Id de la Tienda
 	 * @return Id de la venta
 	 */
-	public int obtenerId()
+	public Integer obtenerId()
 	{
 		return this.id;
 	}
@@ -219,8 +218,7 @@ public class Tienda implements Serializable, ObjetoBD
 	public void cuentaCliente( int idCliente, float dinero) throws ObjetoNoEncontradoExcepcion, SaldoInsuficienteExcepcion
 	{
 		// Se comprueba la existencia del objeto Cliente
-		Cliente cliente = Cliente.buscar( idCliente);
-		if (cliente == null)
+		if (Cliente.buscar( idCliente) == null)
 			throw new ObjetoNoEncontradoExcepcion( "El cliente con id " + idCliente + " no está registrado");
 
 		// Se comprueba si el cliente ya dispone de una cuenta en esta Tienda.
@@ -276,7 +274,7 @@ public class Tienda implements Serializable, ObjetoBD
 	
 	
 	/**
-	 * Método encargado de buscar, en la lista de clientes registrados
+	 * Método encargado de buscar, en la lista de clientes con cuenta
 	 * en la Tienda, alguno con un id de Cliente concreto.
 	 * @param idMusica Id del objeto Musica a buscar.
 	 * @return Objeto InfoMusica encontrado o null si la tienda no lo ha adquirido
@@ -361,7 +359,7 @@ public class Tienda implements Serializable, ObjetoBD
 		 * Devolver el id del objeto Musica al cual se referencia 
 		 * @return idMusica
 		 */
-		public int obtenerId()
+		public Integer obtenerId()
 		{
 			return this.idMusica;
 		}
@@ -469,7 +467,7 @@ public class Tienda implements Serializable, ObjetoBD
 		 * Devolver el id del objeto Cliente al cual se referencia 
 		 * @return idMusica
 		 */
-		public int obtenerId()
+		public Integer obtenerId()
 		{
 			return this.idCliente;
 		}
@@ -520,7 +518,7 @@ class Venta implements Serializable, ObjetoBD
 	 * Obtener el valor del Id de la venta
 	 * @return Id de la venta
 	 */
-	public int obtenerId()
+	public Integer obtenerId()
 	{
 		return this.id;
 	}

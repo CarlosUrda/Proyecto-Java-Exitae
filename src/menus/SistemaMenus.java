@@ -5,6 +5,8 @@ package menus;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import gestionBD.*;
+
 /** 
  * Clase para gestionar el sistema de menús de un programa
  * @author Carlos A. Gómez Urda
@@ -17,12 +19,12 @@ public class SistemaMenus
 	
 	/**
 	 * Constructor
+	 * @param nombre Nombre identificativo del menú principal.
 	 * @param cabecera Cabecera del sistema de menús
-	 * @param texto Texto explicativo de las opciones del menú principal
 	 */
-	public SistemaMenus( String cabecera, String texto)
+	public SistemaMenus( String nombre, String cabecera)
 	{
-		this.opcionCabeza = new SistemaMenus.Opcion( "", cabecera, texto, null);
+		this.opcionCabeza = new SistemaMenus.Opcion( nombre, cabecera, "", null);
 		this.opcionActual = this.opcionCabeza;
 	}
 	
@@ -44,25 +46,44 @@ public class SistemaMenus
 	 * @param datosmenuHijo Array de datos de las opciones. Cada elemento del array
 	 * es un array con los elementos nombre, cabecera y texto de cada opción del submenú.
 	 * @param indiceLocal Posición de la opción donde se agregará el submenú.
-	 * @throws NoExistemenuHijoExcepcion Si el índice de la opción donde agregar el nuevo
-	 * submenú no existe dentro de las opciones del submenú de la opción actual.
+	 * @throws IndexOutOfBoundsException Si no existe una opción, dentro del sistema de menús,
+	 * con los índices pasados.
 	 */
-	public void agregarMenu( String datosMenu[][], int indiceLocal) throws NoExisteMenuExcepcion
+	public void agregarMenu( String datosMenu[][], int indiceLocal)
 	{
 		this.opcionActual.obtenerOpcionHija( indiceLocal).agregarOpcionesHijas( datosMenu);
 	}
 
 
 	/**
+	 * Agregar los datos del submenú dentro de una de las opciones del menú de la opción 
+	 * actual donde nos encontremos.
+	 * @param datosmenuHijo Array de datos de las opciones. Cada elemento del array
+	 * es un array con los elementos nombre, cabecera y texto de cada opción del submenú.
+	 * @param nombre Nombre de la opción local donde agregar el menú.
+	 * @throws NoExisteMenuExcepcion Si no existe con ese nombre la opción local en el 
+	 * submenú actual.
+	 */
+	public void agregarMenu( String datosMenu[][], String nombre) throws NoExisteMenuExcepcion
+	{
+		Opcion opcionHija = this.opcionActual.obtenerOpcionHija( nombre);
+		if (opcionHija == null)
+			throw new NoExisteMenuExcepcion( "No existe la opción local con el nombre" + nombre);
+		
+		opcionHija.agregarOpcionesHijas( datosMenu);
+	}
+
+	
+	/**
 	 * Agregar los datos del submenú dentro de una de las opciones de todo el sistema de menús.
 	 * @param datosmenuHijo Array de datos de las opciones. Cada elemento del array
 	 * es un array con los elementos nombre, cabecera y texto de cada opción del submenú.
 	 * @param indiceGlobal Array de indices que indican la posición, dentro del sistema de menús, 
 	 * de la opción donde se agregará el menú. Si null, se agrega el submenú a la cabecera
-	 * @throws NoExisteMenuExcepcion Si algún índice del array indiceGlobal no existe dentro
-	 * de las opciones del submenú de la opción correspondiente.
+	 * @throws IndexOutOfBoundsException Si no existe una opción, dentro del sistema de menús,
+	 * con los índices pasados.
 	 */
-	public void agregarMenu( String datosMenu[][], int indiceGlobal[]) throws NoExisteMenuExcepcion
+	public void agregarMenu( String datosMenu[][], int indiceGlobal[])
 	{
 		this.obtenerOpcion( indiceGlobal).agregarOpcionesHijas( datosMenu);
 	}
@@ -73,33 +94,55 @@ public class SistemaMenus
 	 * sistema de menús 
 	 * @param indiceGlobal Índice en el sistema de menús de la opción que contiene 
 	 * el menú que se asociará a la opción actual.
-	 * @throws NoExisteMenuExcepcion Si algún índice del array indiceGlobal no existe dentro
-	 * de las opciones del submenú de la opción correspondiente.
+	 * @throws IndexOutOfBoundsException Si no existe una opción, dentro del sistema de menús,
+	 * con los índices pasados.
 	 */
-	public void asociarMenu( int indiceGlobal[]) throws NoExisteMenuExcepcion
+	public void asociarMenu( int indiceGlobal[])
 	{		
 		this.opcionActual.cambiarOpcionesHijas( this.obtenerOpcion( indiceGlobal).obtenerOpcionesHijas());
 	}
 	
 	
 	/**
-	 * Asigna a la opcion activa actualmente el menú asignado a otra opción indiceGlobal 
-	 * en el sistema de menús 
+	 * Asigna a la opcion indiceLocal dentro de la opción actual el menú asignado a otra opción 
+	 * indiceGlobal en el sistema de menús 
 	 * @param indiceLocal Índice de la opción del menú de la opción actual donde se
 	 * asociará el menú de la opción cuyo índice global es indiceGlobal 
 	 * @param indiceGlobal Índice en el sistema de menús de la opción que contiene 
 	 * el menú que se asociará a la opción con indiceLocal dentro del menú de la opción actual.
-	 * @throws NoExisteMenuExcepcion Si algún índice del array indiceGlobal no existe dentro
-	 * de las opciones del submenú de la opción correspondiente.
+	 * @throws IndexOutOfBoundsException Si no existe una opción, dentro del sistema de menús,
+	 * con los índices pasados.
 	 */
-	public void asociarMenu( int indiceLocal, int indiceGlobal[]) throws NoExisteMenuExcepcion
+	public void asociarMenu( int indiceLocal, int indiceGlobal[])
 	{		
 		this.opcionActual.obtenerOpcionHija( indiceLocal).cambiarOpcionesHijas( this.obtenerOpcion( indiceGlobal).obtenerOpcionesHijas());
 	}
 
 	
+	/**
+	 * Asigna a la opcion activa actualmente el menú asignado a otra opción indiceGlobal 
+	 * en el sistema de menús 
+	 * @param nombre Nombre de la opción del menú de la opción actual donde se
+	 * asociará el menú de la opción cuyo índice global es indiceGlobal 
+	 * @param indiceGlobal Índice en el sistema de menús de la opción que contiene 
+	 * el menú que se asociará a la opción con indiceLocal dentro del menú de la opción actual.
+	 * @throws IndexOutOfBoundsException Si no existe una opción, dentro del sistema de menús,
+	 * con el índice global pasados.
+	 * @throws NoExisteMenuExcepcion Si no existe con ese nombre la opción local en el 
+	 * submenú actual.
+	 */
+	public void asociarMenu( String nombre, int indiceGlobal[]) throws NoExisteMenuExcepcion
+	{		
+		Opcion opcionHija = this.opcionActual.obtenerOpcionHija( nombre);
+		if (opcionHija == null)
+			throw new NoExisteMenuExcepcion( "No existe la opción local con el nombre" + nombre);
+		
+		opcionHija.cambiarOpcionesHijas( this.obtenerOpcion( indiceGlobal).obtenerOpcionesHijas());
+	}
+
+	
 	/** 
-	 * Método para agregar una opción en un índice del menú de la opción actual
+	 * Método para agregar una opción en una posición índice del menú de la opción actual
 	 * @param nombre Nombre identificativo de la subopción a agregar.
 	 * @param cabecera Cabecera del submenú que se accede a través de la subopción a agregar.
 	 * @param texto Texto que representa la subopción a agregar. Este texto aparece en el menú
@@ -140,12 +183,30 @@ public class SistemaMenus
 	 * Avanzar por el sistema de menús entrando en una opción dentro de las opciones 
 	 * posibles del submenú de la opción actual.
 	 * @param indice Número de opción a elegir para avanzar.
-	 * @throws NoExisteMenuExcepcion Si el índice de la opción a avanzar no existe dentro
-	 * de las opciones del submenú de la opción actual.
+	 * @throws IndexOutOfBoundsException Si no existe la opción con índice local en 
+	 * el menú actual. 
 	 */
-	public void avanzar( int indice) throws NoExisteMenuExcepcion
+	public void avanzar( int indice)
 	{
 		this.opcionActual = this.opcionActual.obtenerOpcionHija( indice);
+	}
+	
+	
+	/**
+	 * Avanzar por el sistema de menús entrando en una opción dentro de las opciones 
+	 * posibles del submenú de la opción actual.
+	 * MEJORA: Se podría hacer que avanzase a la opción nombre dentro del sistema de
+	 * menús sin importar si esa opción es local o no.
+	 * @param nombre Nombre de la opción a elegir para avanzar.
+	 * @throws NoExisteMenuExcepcion Si no existe la opción en el submenú con ese nombre.
+	 */
+	public void avanzar( String nombre) throws NoExisteMenuExcepcion
+	{
+		Opcion opcionHija = this.opcionActual.obtenerOpcionHija( nombre);
+		if (opcionHija == null)
+			throw new NoExisteMenuExcepcion( "No existe la opción local con el nombre " + nombre);
+
+		this.opcionActual = opcionHija;
 	}
 	
 	
@@ -157,7 +218,7 @@ public class SistemaMenus
 	 */
 	public void retroceder() throws NoExisteMenuExcepcion
 	{
-		SistemaMenus.Opcion opcionPadre = this.opcionActual.obtenerOpcionPadre();
+		Opcion opcionPadre = this.opcionActual.obtenerOpcionPadre();
 		if (opcionPadre == null)
 			throw new NoExisteMenuExcepcion( "Ya te encuentras en la cabecera del sistema de menús");
 		
@@ -176,13 +237,22 @@ public class SistemaMenus
 	
 	
 	/**
+	 * Devuelve el nombre de la opción con indiceLocal dentro del menú de la opción actual.
+	 * @return Nombre de la opción.
+	 */
+	public String obtenerNombre( int indiceLocal)
+	{
+		return opcionActual.obtenerOpcionHija( indiceLocal).obtenerNombre();
+	}
+	
+	
+	/**
 	 * Obtener la opción dentro del sistema de menús a partir de su posición global
 	 * @param indiceGlobal Array con los índices que indican la posición global de la opción.
 	 * @return Opcion con el índice global.
-	 * @throws NoExisteMenuExcepcion Si algún índice del array indiceGlobal no existe dentro
-	 * de las opciones del submenú de la opción correspondiente.
+	 * @throws IndexOutOfBoundsException Si no existe el índice dentro del sistema de menús. 
 	 */
-	private Opcion obtenerOpcion( int indiceGlobal[]) throws NoExisteMenuExcepcion
+	private Opcion obtenerOpcion( int indiceGlobal[])
 	{		
 		SistemaMenus.Opcion opcion = this.opcionCabeza;
 		
@@ -195,15 +265,47 @@ public class SistemaMenus
 	
 	
 	/**
+	 * Obtener la opción dentro del sistema de menús a partir de su nombre
+	 * @param nombre Nombre de la opción a buscar.
+	 * @return Opcion con el nombre pasado.
+	 * @throws NoExisteMenuExcepcion Si no existe una opción con el nombre.
+	 */
+//	private Opcion obtenerOpcion( String nombre) throws NoExisteMenuExcepcion
+//	{		
+//		Opcion opcionBusqueda = this.opcionCabeza;
+//		Opcion opcionEncontrada = null; 
+//		
+//		if (opcionBusqueda.nombre.equals( nombre))
+//			return opcionBusqueda;
+//		
+//		while (opcionBusqueda != null)
+//		{
+//			opcionEncontrada = opcionBusqueda.obtenerOpcionHija(nombre);
+//			if (opcionEncontrada != null)
+//				break;
+//
+//			Iterator<Opcion> iterator = opcionBusqueda.obtenerOpcionesHijas().iterator();
+//
+//			if (iterator.hasNext())
+//				opcionBusqueda = iterator.next();
+//			else
+//				opcionBusqueda = opcionBusqueda.obtenerOpcionPadre();
+//		}
+//		
+//		return opcionEncontrada;
+//	}
+	
+	
+	/**
 	 * Clase que representa cada opción de un menú
 	 * @author Carlos A. Gómez Urda
 	 * @version 1.0
 	 */
-	private class Opcion 
+	private class Opcion implements ObjetoBD
 	{
 		private String nombre;     				  		// Nombre identificativo de la opción de menú
 		private String cabecera;   				  		// Cabecera del submenú que representa esta opción
-		private String texto;    				  		// Texto explicativo de la opción
+		private String texto;    				  		// Texto descriptivo de la opción
 		private ArrayList<SistemaMenus.Opcion> opcionesHijas;   // Array de opciones que forman el menú de esta opción
 		private SistemaMenus.Opcion opcionPadre;          		// Opcion en cuyo menú está la opción en la que nos encontramos actualmente
 		
@@ -213,7 +315,7 @@ public class SistemaMenus
 		 * Opcion padre de esta opción.
 		 * @param cabecera Texto de la cabecera que aparecerá dentro del submenú a
 		 * donde lleva esta opción
-		 * @param texto Texto opcional que puede aparecer debajo de la cabecera anterior.
+		 * @param texto Texto descriptivo de la opción que aparecerá en el menú padre.
 		 * @param opcionPadre Opcion en cuyo menú está la Opcion que seestá creando. 
 		 */
 		public Opcion( String nombre, String cabecera, String texto, SistemaMenus.Opcion opcionPadre)
@@ -257,9 +359,7 @@ public class SistemaMenus
 		 */
 		public void agregarOpcionHija( String nombre, String cabecera, String texto, int indice) 
 		{
-			SistemaMenus.Opcion opcionHija = SistemaMenus.this.new Opcion( nombre, cabecera, texto, this);
-			
-			this.opcionesHijas.add( indice, opcionHija);
+			this.opcionesHijas.add( indice, SistemaMenus.this.new Opcion( nombre, cabecera, texto, this));
 		}
 
 	
@@ -272,9 +372,7 @@ public class SistemaMenus
 		 */
 		public void agregarOpcionHija( String nombre, String cabecera, String texto)
 		{
-			SistemaMenus.Opcion opcionHija = SistemaMenus.this.new Opcion( nombre, cabecera, texto, this);
-
-			this.opcionesHijas.add( opcionHija);
+			this.opcionesHijas.add( SistemaMenus.this.new Opcion( nombre, cabecera, texto, this));
 		}
 		
 		
@@ -307,13 +405,22 @@ public class SistemaMenus
 		 * @return La Opcion encontrada en la posición índice dentro del submenú de la opción actual.
 		 * @throws IndexOutOfBoundsException Si existe un submenú pero el índice no existe dentro de 
 		 * las opciones de ese submenú
-		 * @throws NoExisteMenuExcepcion Si esta opción no tiene ningún menú hijo
 		 */
-		public SistemaMenus.Opcion obtenerOpcionHija( int indice) throws NoExisteMenuExcepcion
+		public Opcion obtenerOpcionHija( int indice)
 		{
-			if (this.opcionesHijas == null)
-				throw new NoExisteMenuExcepcion( "Esta opción no tiene ningún submenú configurado");
 			return this.opcionesHijas.get( indice);
+		}
+
+		
+		/**
+		 * Obtener la Opcion con un nombre determinado en el menú de la Opcion actual.
+		 * @param nombre Nombre de la opción a obtener dentro del submenú de la opción actual.
+		 * @return La Opcion encontrada dentro del submenú de la opción actual.
+		 * Null si no existe ninguna Opcion con ese nombre
+		 */
+		public Opcion obtenerOpcionHija( String nombre)
+		{
+			return BD.buscarObjeto( this.opcionesHijas, nombre);
 		}
 
 		
@@ -349,6 +456,16 @@ public class SistemaMenus
 			{
 				System.out.println( i + ".-" + opcionesIterator.next().texto);
 			}
+		}		
+
+		
+		/**
+		 * Devolver el id del objeto Opcion (su nombre). 
+		 * @return nombre identificativo de la opción.
+		 */
+		public String obtenerId()
+		{
+			return this.nombre;
 		}		
 	}
 }

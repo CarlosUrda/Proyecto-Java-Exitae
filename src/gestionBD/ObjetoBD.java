@@ -10,5 +10,5 @@ package gestionBD;
  */
 public interface ObjetoBD 
 {
-	public int obtenerId();
+	public Object obtenerId();
 }

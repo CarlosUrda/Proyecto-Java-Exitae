@@ -3,6 +3,7 @@
  */
 package comercio;
 
+import excepcionesGenericas.ObjetoNoEncontradoExcepcion;
 import gestionBD.BD;
 import gestionBD.ObjetoBD;
 
@@ -130,7 +131,7 @@ public abstract class Musica implements Serializable, ObjetoBD
 	 * Obtener el Id del objeto Musica
 	 * @return Id
 	 */
-	public int obtenerId()
+	public Integer obtenerId()
 	{
 		return this.id;
 	}

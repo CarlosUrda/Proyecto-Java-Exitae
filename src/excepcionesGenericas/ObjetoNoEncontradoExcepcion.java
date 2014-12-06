@@ -1,4 +1,4 @@
-package comercio;
+package excepcionesGenericas;
 import java.lang.Exception;
 
 /**

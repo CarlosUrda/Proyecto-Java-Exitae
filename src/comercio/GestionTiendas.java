@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-// SOLICIONAR LA SIGNACIÓN DE ID'S, QUE NO FUNCIONA BIEN.
-
 /**
  * Gestión de un sistema de Tiendas
  * @author Carlos A. Gómez Urda
@@ -33,15 +31,21 @@ public class GestionTiendas
 	private static SistemaMenus crearMenus()
 	{
 		// Se crean el menú principal.
-		SistemaMenus menu = new SistemaMenus( "Principal", "Selección de la tienda a gestionar");
-		String subMenu[][] = {{"EligeTienda", "Selecciona una de las tiendas ya creadas", "Elige tienda creada"},
-							  {"CreaTienda", "Crear una nueva tienda", "Introduce los datos de la nueva tienda"},
-							  {"Salir", "Salir del programa", ""}};
-		menu.agregarSubMenu( subMenu);		
+		SistemaMenus menu = new SistemaMenus( "MenuPrincipal", "Sistema de gestión de Tiendas - Menú principal");
+		String subMenu[][] = {{"GestionarTiendas", "Menú de gestión de Tiendas", "Gestionar Tiendas."},
+							  {"GestionarClientes", "Menú de gestión de Clientes", "Gestionar Clientes."},
+							  {"GestionarProductos", "Menú de gestión de Productos musicales", "Gestionar Música."},
+							  {"Comandos", "Modo comandos", "Entrar en modo comandos."},
+							  {"Salir", "", "Salir del programa"}};
+		menu.agregarMenu( subMenu);		
 
-		subMenu = new String[][]{{"EligeTienda", "Selecciona una de las tiendas ya creadas", "Elige tienda creada"},
-					   			 {"CreaTienda", "Crear una nueva tienda", "Introduce los datos de la nueva tienda"},
-					   			 {"Salir", "Salir del programa", ""}};
+		subMenu = new String[][]{{"RegistrarTienda", "Registro de nueva tienda", "Registra una nueva tienda."},
+								 {"EliminarTienda", "Eliminación de tienda", "Elimina una tienda existente"},
+					   			 {"ListarTiendas", "Listado de tiendas.", "Listado de todas las tiendas existentes."},
+					   			 {"Volver", "", "Volver al menú anterior."}};
+		menu.agregarMenu(datosMenu, indiceLocal);
+		
+		return menu;
 	}
 	
 	
@@ -60,16 +64,13 @@ public class GestionTiendas
 		{
 			Tienda.cargarBD( GestionTiendas.nombreArchivoTiendas);
 		}
-		catch (FileNotFoundException e)
+		catch (Exception e)
 		{
-			System.err.println( "El archivo " + GestionTiendas.nombreArchivoTiendas + " no existe.");
 			System.err.println( e.getMessage());
+			return;
 		}
-		catch (IOException e)
-		{
-			System.err.println( "Error al acceder al archivo " + GestionTiendas.nombreArchivoTiendas);
-			System.err.println( e.getMessage());			
-		}
+		
+		
 		
 		
 		
@@ -79,15 +80,9 @@ public class GestionTiendas
 		{
 			Tienda.guardarBD( GestionTiendas.nombreArchivoTiendas);
 		}
-		catch (FileNotFoundException e)
+		catch (Exception e)
 		{
-			System.err.println( "El archivo " + GestionTiendas.nombreArchivoTiendas + " no existe.");
 			System.err.println( e.getMessage());
-		}
-		catch (IOException e)
-		{
-			System.err.println( "Error al acceder al archivo " + GestionTiendas.nombreArchivoTiendas);
-			System.err.println( e.getMessage());			
 		}
 		
 	}

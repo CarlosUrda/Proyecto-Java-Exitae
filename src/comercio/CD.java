@@ -3,6 +3,8 @@
  */
 package comercio;
 
+import excepcionesGenericas.ObjetoExisteExcepcion;
+
 /**
  * Clase que representa un objeto CD
  * @author Carlos A. Gómez Urda

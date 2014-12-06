@@ -73,10 +73,10 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 	/**
 	 * Buscar un objeto T con un id determinado dentro de una lista de objetos 
 	 * @param lista Lista de objetos donde buscar. 
-	 * @param id Id del objeto a buscar
+	 * @param id Id del objeto a buscar.
 	 * @return Objeto encontrado. Si no se encuentra devuelve null.
 	 */
-	public static <T> T buscarObjeto( ArrayList<T> lista, int id)
+	public static <T> T buscarObjeto( ArrayList<T> lista, Object id)
 	{
 		Iterator<T> iterator = lista.iterator();
 		T objeto;
@@ -84,7 +84,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		while (iterator.hasNext())
 		{
 			objeto = iterator.next();
-			if (((ObjetoBD) objeto).obtenerId() == id)
+			if (((ObjetoBD) objeto).obtenerId().equals( id))
 				return objeto;
 		}
 		

@@ -3,6 +3,7 @@
  */
 package comercio;
 
+import excepcionesGenericas.ObjetoExisteExcepcion;
 import gestionBD.BD;
 import gestionBD.ObjetoBD;
 
@@ -92,9 +93,9 @@ public class Cliente implements Serializable, ObjetoBD
 	 * @param id Id del objeto Cliente a buscar
 	 * @return Objeto Cliente encontrado. Si no se encuentra devuelve null.
 	 */
-	public static Cliente buscar( int id)
+	public static Cliente buscar( Integer id)
 	{
-		return BD.buscarObjeto( Cliente.lista, id);
+		return BD.buscarObjeto( Cliente.lista, id);			
 	}
 
 	
@@ -136,7 +137,7 @@ public class Cliente implements Serializable, ObjetoBD
 	 * Obtener el Id del objeto Musica
 	 * @return Id
 	 */
-	public int obtenerId()
+	public Integer obtenerId()
 	{
 		return this.id;
 	}
