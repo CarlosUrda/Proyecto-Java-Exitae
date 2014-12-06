@@ -42,7 +42,7 @@ public class CD extends Musica
 	 */
 	public CD( String nombre, String codigo, float precio) 
 	{
-		super( nombre, codigo, precio);
+		super( nombre, codigo, Musica.Tipo.cd, precio);
 	}
 
 }

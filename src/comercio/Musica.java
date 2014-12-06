@@ -21,11 +21,12 @@ public abstract class Musica implements Serializable, ObjetoBD
 {
 	private static final long serialVersionUID = 1L;
 	private static Integer idGeneral = 1;
-	protected static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos
-	
+	protected static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos	
+	protected enum Tipo {cd, vinilo, casete}; 
 	private Integer id;			  // Id del producto en la base de datos.
 	private String nombre;	  // Nombre del producto
 	private String codigo;    // Código único del producto
+	private Tipo tipo;      // Tipo de producto.
 	private float precio;     // Precio base del producto.
 	
 	
@@ -33,13 +34,15 @@ public abstract class Musica implements Serializable, ObjetoBD
 	 * Constructor
 	 * @param nombre Nombre del objeto Musica
 	 * @param codigo Codigo único (estilo código de barras) del producto.
+	 * @param tipo Tipo de producto de Musica.
 	 * @param precio Precio base del producto.
 	 */
-	protected Musica( String nombre, String codigo, float precio)
+	protected Musica( String nombre, String codigo, Tipo tipo, float precio)
 	{
 		this.nombre = nombre;
 		this.codigo = codigo;
 		this.precio = precio;
+		this.tipo = tipo;
 		this.id = Musica.idGeneral++;
 	}
 

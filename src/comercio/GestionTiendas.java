@@ -2,7 +2,9 @@
  * 
  */
 package comercio;
+import java.util.Scanner;
 import menus.*;
+import excepcionesGenericas.*;
 
 /**
  * Gestión de un sistema de Tiendas
@@ -13,6 +15,8 @@ public class GestionTiendas
 {
 	// Nombre de archivo donde se guardan los datos de las tiendas.
 	private static String nombreArchivoTiendas = "tiendas.txt";
+	private static String nombreArchivoMusicas = "musicas.txt";
+	private static String nombreArchivoClientes = "clientes.txt";
 
 	
 	/**
@@ -33,6 +37,7 @@ public class GestionTiendas
 								 {"EliminarTienda", "Eliminación de tienda", "Elimina una tienda registrada."},
 					   			 {"EditarTienda", "Edición de la tienda.", "Edición de una de las tiendas registradas."},
 					   			 {"ListarTiendas", "Listado de tiendas.", "Listado de todas las tiendas registradas."},
+					   			 {"AdministrarTienda", "Administrar Tienda", "Administrar y gestionar una Tienda."},
 					   			 {"Volver", "", "Volver al menú anterior."}};
 		menu.agregarMenu( subMenu, "GestionarTiendas");
 		
@@ -43,12 +48,20 @@ public class GestionTiendas
 					   			 {"Volver", "", "Volver al menú anterior."}};
 		menu.agregarMenu( subMenu, "GestionarClientes");
 		
-		subMenu = new String[][]{{"RegistrarProducto", "Registro de un nuevo producto.", "Registra un nuevo producto en la cadena de tiendas."},
-								 {"EliminarProducto", "Eliminación de un producto.", "Elimina un producto registrado."},
-					   			 {"EditarCliente", "Edición del cliente.", "Edición de los datos de un cliente registrado."},
-					   			 {"ListarClientes", "Listado de clientes.", "Listado de todos los clientes registrados."},
+		subMenu = new String[][]{{"RegistrarCD", "Registro de un nuevo CD.", "Registra un nuevo CD en la cadena de tiendas."},
+								 {"EliminarProducto", "Eliminación del producto.", "Elimina un producto registrado."},
+					   			 {"EditarProducto", "Edición del producto.", "Edición de los datos de un producto registrado."},
+					   			 {"ListarProductos", "Listado de productos.", "Listado de todos los productos registrados."},
 					   			 {"Volver", "", "Volver al menú anterior."}};
-		menu.agregarMenu( subMenu, "GestionarClientes");
+		menu.agregarMenu( subMenu, "GestionarProductos");
+
+		subMenu = new String[][]{{"GestionarStock", "Modificar stock", "Aumentar o disminuir el stock en la tienda de un producto registrado."},
+								 {"GestionarPrecio", "Modificar precio", "Cambiar el prcio de un producto en esta tienda."},
+								 {"GestionarSaldo", "Modificar saldo.", "Modificar el saldo de la cuenta de un cliente."},
+					   			 {"BloquearCliente", "Cliente bloqueado.", "Bloquear la cuenta de un cliente."},
+					   			 {"RealizarVenta", "Venta de un producto.", "Realizar la venta de un producto a un cliente."},
+					   			 {"Volver", "", "Volver al menú anterior."}};
+		menu.agregarMenu( subMenu, new int[]{0, 4});
 
 		return menu;
 	}
@@ -61,6 +74,8 @@ public class GestionTiendas
 	 */
 	public static void main( String[] args) 
 	{
+		SistemaMenus menu = null;
+		
 		if (args.length > 0)
 			GestionTiendas.nombreArchivoTiendas = args[0];
 		
@@ -68,7 +83,9 @@ public class GestionTiendas
 		try
 		{
 			Tienda.cargarBD( GestionTiendas.nombreArchivoTiendas);
-			GestionTiendas.crearMenus();
+			Musica.cargarBD( GestionTiendas.nombreArchivoMusicas);
+			Cliente.cargarBD( GestionTiendas.nombreArchivoClientes);
+			menu = GestionTiendas.crearMenus();
 		}
 		catch (Exception e)
 		{
@@ -76,15 +93,124 @@ public class GestionTiendas
 			return;
 		}
 		
+		boolean salir = false;
 		
+		// Variables temporales para leer datos del usuario
+		int opcion;
+		String nombre;
+		String codigo;
+		float valor;
+		char respuesta;
 		
+		Scanner scanner = new Scanner( System.in);
+
+		do
+		{
+			menu.mostrarMenu();
+			System.out.print( "Introduce la opción: ");
+			opcion = scanner.nextInt();
+			
+			switch (menu.obtenerNombre( opcion))
+			{
+				case "RegistrarTienda":					
+					while (true)
+					{
+						System.out.print( "Introduce el nombre de la tienda: ");
+						nombre = scanner.nextLine();
+						System.out.print( "Introduce el cif de la tienda: ");
+						codigo = scanner.nextLine();
+						System.out.print( "Introduce la deuda límite por cliente admitida en la tienda: ");
+						valor = scanner.nextFloat(); 
+						try
+						{						
+							Tienda.registrar( nombre, codigo, valor);
+						}
+						catch (ObjetoExisteExcepcion e)
+						{
+							System.out.println( e.getMessage());
+							continue;
+						}
+						break;
+					};
+					break;
+			
+				case "RegistrarCliente":					
+					while (true)
+					{
+						System.out.print( "Introduce el nombre del cliente: ");
+						nombre = scanner.nextLine();
+						System.out.print( "Introduce el dni del cliente: ");
+						codigo = scanner.nextLine();
+						try
+						{						
+							Cliente.registrar(nombre, codigo);
+						}
+						catch (ObjetoExisteExcepcion e)
+						{
+							System.out.println( e.getMessage());
+							continue;
+						}
+						break;
+					};
+					break;
+
+				case "RegistrarCD":					
+					while (true)
+					{
+						System.out.print( "Introduce el nombre del CD: ");
+						nombre = scanner.nextLine();
+						System.out.print( "Introduce el código del CD: ");
+						codigo = scanner.nextLine();
+						System.out.print( "Introduce el precio base oficial del CD: ");
+						valor = scanner.nextFloat(); 
+						try
+						{						
+							CD.registrar(nombre, codigo, valor);
+						}
+						catch (ObjetoExisteExcepcion e)
+						{
+							System.out.println( e.getMessage());
+							System.out.println( "¿Deseas intentarlo de nuevo? (s/n): ");
+							if (((Byte)scanner.next).toString().to == 's'
+							
+							continue;
+						}
+						break;
+					};
+					break;
+
+				case "Volver":
+					try
+					{
+						menu.retroceder();
+						break;
+					}
+					catch (Exception e)
+					{
+						System.err.println( e.getMessage());
+						return;
+					}
+					
+				case "Salir":
+					salir = true;
+					break;
+					
+				default:
+					menu.avanzar( opcion);
+					break;
+			}
+			
+		} while (!salir);
 		
+		scanner.close();
 		
 		
 		// Se guardan las tiendas.
 		try
 		{
 			Tienda.guardarBD( GestionTiendas.nombreArchivoTiendas);
+			Tienda.guardarBD( GestionTiendas.nombreArchivoMusicas);
+			Tienda.guardarBD( GestionTiendas.nombreArchivoClientes);
 		}
 		catch (Exception e)
 		{
