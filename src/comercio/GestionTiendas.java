@@ -101,7 +101,6 @@ public class GestionTiendas
 		String codigo;
 		float valor;
 		char respuesta;
-		
 		Scanner scanner = new Scanner( System.in);
 
 		do
@@ -205,12 +204,12 @@ public class GestionTiendas
 		scanner.close();
 		
 		
-		// Se guardan las tiendas.
+		// Se guardan los datos en la base de datos.
 		try
 		{
 			Tienda.guardarBD( GestionTiendas.nombreArchivoTiendas);
-			Tienda.guardarBD( GestionTiendas.nombreArchivoMusicas);
-			Tienda.guardarBD( GestionTiendas.nombreArchivoClientes);
+			Musica.guardarBD( GestionTiendas.nombreArchivoMusicas);
+			Cliente.guardarBD( GestionTiendas.nombreArchivoClientes);
 		}
 		catch (Exception e)
 		{
@@ -220,4 +219,6 @@ public class GestionTiendas
 	}
 
 }
+
+// Modo comandos
 
