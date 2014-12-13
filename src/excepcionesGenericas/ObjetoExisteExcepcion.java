@@ -3,7 +3,6 @@ import java.lang.Exception;
 
 /**
  * Excepción que informa si un objeto ya está registrado en la base de datos.
- * un pago.
  * @author Carlos A. Gómez Urda
  * @version 1.0
  */

@@ -232,7 +232,7 @@ public class SistemaMenus
 	 */
 	public String obtenerNombre()
 	{
-		return opcionActual.obtenerNombre();
+		return opcionActual.getNombre();
 	}
 	
 	
@@ -242,7 +242,7 @@ public class SistemaMenus
 	 */
 	public String obtenerNombre( int indiceLocal)
 	{
-		return opcionActual.obtenerOpcionHija( indiceLocal).obtenerNombre();
+		return opcionActual.obtenerOpcionHija( indiceLocal).getNombre();
 	}
 	
 	
@@ -331,7 +331,7 @@ public class SistemaMenus
 		 * Devuelve el nombre de la opción.
 		 * @return Nombre de la opción.
 		 */
-		public String obtenerNombre()
+		public String getNombre()
 		{
 			return this.nombre;
 		}
@@ -341,7 +341,7 @@ public class SistemaMenus
 		 * Modificar la cabecera del menú de esta opción
 		 * @param cabecera
 		 */
-		public void cambiarCabecera( String cabecera)
+		public void setCabecera( String cabecera)
 		{
 			this.cabecera = cabecera;
 		}
@@ -463,7 +463,7 @@ public class SistemaMenus
 		 * Devolver el id del objeto Opcion (su nombre). 
 		 * @return nombre identificativo de la opción.
 		 */
-		public String obtenerId()
+		public String getId()
 		{
 			return this.nombre;
 		}		

@@ -147,6 +147,15 @@ public class Cliente implements Serializable, ObjetoBD
 	
 	
 	/**
+	 * Mostrar por pantalla los datos del Cliente
+	 */
+	public final void mostrarDatos()
+	{
+		System.out.println( "Id: " + this.id + "; Nombre: " + this.nombre + "; DNI: " + this.dni);
+	}
+
+	
+	/**
 	 * Sobrecarga de método equals para comparar objetos Cliente
 	 * @param cliente Objeto a comparar
 	 * @return Si el objeto es de tipo Cliente devuelve true si coincide el dni,
@@ -157,38 +166,50 @@ public class Cliente implements Serializable, ObjetoBD
 	public boolean equals( Object cliente)
 	{
 		if (cliente instanceof Cliente)
-			return this.dni.equalsIgnoreCase( ((Cliente)cliente).obtenerDni());
+			return this.dni.equalsIgnoreCase( ((Cliente)cliente).getDni());
 		
 		return this == cliente;
 	}
+
+
+	/**
+	 * @return the nombre
+	 */
+	public final String getNombre() {
+		return nombre;
+	}
+
+
+	/**
+	 * @param nombre the nombre to set
+	 */
+	public final void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+
+	/**
+	 * @return the dni
+	 */
+	public final String getDni() {
+		return dni;
+	}
+
+
+	/**
+	 * @param dni the dni to set
+	 */
+	public final void setDni(String dni) {
+		this.dni = dni;
+	}
+
+
+	/**
+	 * @return the id
+	 */
+	public final Integer getId() {
+		return id;
+	}
 	
 	
-	/**
-	 * Obtener el Id del objeto Musica
-	 * @return Id
-	 */
-	public Integer obtenerId()
-	{
-		return this.id;
-	}
-
-
-	/**
-	 * Obtener el nombre de un CLiente.
-	 * @return Precio base
-	 */
-	public String obtenerNombre()
-	{
-		return this.nombre;
-	}
-
-
-	/**
-	 * Obtener el DNI de un CLiente.
-	 * @return Precio base
-	 */
-	public String obtenerDni()
-	{
-		return this.dni;
-	}
 }

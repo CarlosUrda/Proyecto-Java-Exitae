@@ -22,27 +22,23 @@ public abstract class Musica implements Serializable, ObjetoBD
 	private static final long serialVersionUID = 1L;
 	private static Integer idGeneral = 1;
 	protected static ArrayList<Musica> lista;	// Lista de objetos Musica cargados en memoria desde la base de datos	
-	protected enum Tipo {cd, vinilo, casete}; 
-	private Integer id;			  // Id del producto en la base de datos.
-	private String nombre;	  // Nombre del producto
-	private String codigo;    // Código único del producto
-	private Tipo tipo;      // Tipo de producto.
-	private float precio;     // Precio base del producto.
+	protected Integer id;			  // Id del producto en la base de datos.
+	protected String nombre;	  // Nombre del producto
+	protected String codigo;    // Código único del producto
+	protected float precio;     // Precio base del producto.
 	
 	
 	/**
 	 * Constructor
 	 * @param nombre Nombre del objeto Musica
 	 * @param codigo Codigo único (estilo código de barras) del producto.
-	 * @param tipo Tipo de producto de Musica.
 	 * @param precio Precio base del producto.
 	 */
-	protected Musica( String nombre, String codigo, Tipo tipo, float precio)
+	protected Musica( String nombre, String codigo, float precio)
 	{
 		this.nombre = nombre;
 		this.codigo = codigo;
 		this.precio = precio;
-		this.tipo = tipo;
 		this.id = Musica.idGeneral++;
 	}
 
@@ -118,11 +114,14 @@ public abstract class Musica implements Serializable, ObjetoBD
 		ArrayList<Tienda> tiendas = Tienda.obtenerTiendas();
 		Iterator<Tienda> iterator = tiendas.iterator();
 		
-		boolean eliminado = true;  // Flag para saber si se ha eliminado toda la información del Cliente en las tiendas. 
+		boolean eliminado = true;  // Flag para saber si se ha eliminado toda la información del objeto Musica en las tiendas. 
+
+		// Se intenta eliminar la información del objeto Musica de cada una de las tiendas.
 		while (iterator.hasNext())
 			 if ((iterator.next().eliminarMusica( id, destruir) == false) && eliminado)
 				 eliminado = false;
 		
+		// Si se ha eliminado toda la información en las tiendas, se elimina el registro.
 		if (eliminado)
 			Musica.lista.remove( musica);
 		
@@ -141,38 +140,77 @@ public abstract class Musica implements Serializable, ObjetoBD
 	public boolean equals( Object musica)
 	{
 		if (musica instanceof Musica)
-			return this.codigo.equalsIgnoreCase( ((Musica)musica).obtenerCodigo());
+			return this.codigo.equalsIgnoreCase( ((Musica) musica).getCodigo());
 		
 		return this == musica;
 	}
 
-	
+
 	/**
-	 * Obtener el Id del objeto Musica
-	 * @return Id
+	 * @return the nombre
 	 */
-	public Integer obtenerId()
-	{
-		return this.id;
+	public final String getNombre() {
+		return nombre;
 	}
 
 
 	/**
-	 * Obtener el codigo del objeto Musica
-	 * @return Precio base
+	 * @param nombre the nombre to set
 	 */
-	public String obtenerCodigo()
-	{
-		return this.codigo;
+	public final void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
-	
+
 	/**
-	 * Obtener el precio base del objeto Musica
-	 * @return Precio base
+	 * @return the codigo
 	 */
-	public float obtenerPrecio()
-	{
-		return this.precio;
+	public final String getCodigo() {
+		return codigo;
 	}
+
+
+	/**
+	 * @param codigo the codigo to set
+	 */
+	public final void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+
+	/**
+	 * @return the precio
+	 */
+	public final float getPrecio() {
+		return precio;
+	}
+
+
+	/**
+	 * @param precio the precio to set
+	 */
+	public final void setPrecio(float precio) {
+		this.precio = precio;
+	}
+
+
+	/**
+	 * @return the id
+	 */
+	public final Integer getId() {
+		return id;
+	}
+
+
+	/**
+	 * Obtener el nombre del tipo de producto de música
+	 * @return El nombre del tipo de música: "CD", "Vinilo" o "Casete"
+	 */
+	public abstract String getNombreTipo();
+
+	/**
+	 * Mostrar por pantalla los datos de un producto Musica
+	 */
+	public abstract void mostrarDatos();
+
 }

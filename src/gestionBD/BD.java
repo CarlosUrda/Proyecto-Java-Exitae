@@ -84,7 +84,7 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		while (iterator.hasNext())
 		{
 			objeto = iterator.next();
-			if (((ObjetoBD) objeto).obtenerId().equals( id))
+			if (((ObjetoBD) objeto).getId().equals( id))
 				return objeto;
 		}
 		

@@ -42,7 +42,29 @@ public class CD extends Musica
 	 */
 	public CD( String nombre, String codigo, float precio) 
 	{
-		super( nombre, codigo, Musica.Tipo.cd, precio);
+		super( nombre, codigo, precio);
 	}
 
+
+	/**
+	 * Obtener el nombre del tipo de producto de música
+	 * @return El nombre del tipo de música: "CD"
+	 */
+	@Override
+	public String getNombreTipo() {
+		return "CD";
+	}
+
+	
+	/**
+	 * Mostrar por pantalla los datos del CD
+	 */
+	@Override
+	public final void mostrarDatos()
+	{
+		System.out.println( "Id: " + this.id + "; Tipo: CD; Nombre: " + this.nombre + "; Código: " + 
+							this.codigo + "; Precio base: " + this.precio);
+	}
+
+	
 }
