@@ -35,17 +35,28 @@ public class BD
 	 */
 	public static <T> ArrayList<T> leerObjetos( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
-		ObjectInputStream archivo = new ObjectInputStream( new FileInputStream( nombreArchivo));
+		ObjectInputStream objectInput;
 		ArrayList<T> lista = new ArrayList<T>();
+		FileInputStream fileInput = new FileInputStream( nombreArchivo);
 		
+		// Se comprueba si ek archivo esá vacío
+		if (fileInput.available() == 0)
+		{
+			fileInput.close();
+			return lista;
+		}
+		
+		objectInput = new ObjectInputStream( fileInput);
+	
 		try
 		{
 			while (true)
-				lista.add( (T)archivo.readObject());
+				lista.add( (T)objectInput.readObject());
 		}
 		catch (EOFException e)
 		{
-			archivo.close();
+			objectInput.close();
+			fileInput.close();
 			return lista;
 		}		
 	}

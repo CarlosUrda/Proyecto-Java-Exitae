@@ -113,19 +113,24 @@ public class Tienda implements Serializable, ObjetoBD
 	{
 		// Se obtiene el id más alto a empezar asignar para tiendas
 		Tienda.lista = BD.leerObjetos( nombreArchivo);
-		Tienda.idGeneral = Tienda.lista.get( Tienda.lista.size()-1).id + 1;
+		int sizeLista = Tienda.lista.size();
+		Tienda.idGeneral = (sizeLista == 0) ? 1 : (Tienda.lista.get( sizeLista-1).id + 1);
 
 		// Se obtiene el id más alto a empezar asignar para ventas
 		Tienda tienda;
 		Iterator<Tienda> iteratorTienda = Tienda.lista.iterator();
-		Integer idGeneralVentas = 1;
-		Integer idVenta;
+		Integer idGeneralVentas = 0;
+		Integer idVenta, sizeVentas;
 		while (iteratorTienda.hasNext())
 		{
 			tienda = iteratorTienda.next();
-			idVenta = tienda.listaVentas.get( tienda.listaVentas.size() - 1).getId();
-			if (idVenta > idGeneralVentas)
-				idGeneralVentas = idVenta;
+			sizeVentas = tienda.listaVentas.size();
+			if (sizeVentas > 0)
+			{
+				idVenta = tienda.listaVentas.get( sizeVentas - 1).getId();
+				if (idVenta > idGeneralVentas)
+					idGeneralVentas = idVenta;
+			}
 		}
 		Venta.setIdGeneral( idGeneralVentas + 1);
 	}
@@ -166,6 +171,9 @@ public class Tienda implements Serializable, ObjetoBD
 		this.nombre = nombre;
 		this.cif = cif;
 		this.deudaLimite = deudaLimite;
+		this.listaInfoCliente = new ArrayList<InfoCliente>();
+		this.listaInfoMusica = new ArrayList<InfoMusica>();
+		this.listaVentas = new ArrayList<Venta>();
 	}
 
 
@@ -412,10 +420,10 @@ public class Tienda implements Serializable, ObjetoBD
 		InfoMusica infoMusica = this.buscarInfoMusica( idMusica);
 		if (infoMusica != null)
 		{
-			if (infoMusica.hayStock() && !destruir)
-				return false;
-			else
+			if (destruir || !infoMusica.hayStock())
 				this.listaInfoMusica.remove( infoMusica);
+			else
+				return false;
 		}
 		
 		return true;
@@ -435,10 +443,10 @@ public class Tienda implements Serializable, ObjetoBD
 		InfoCliente infoCliente = this.buscarInfoCliente( idCliente);
 		if (infoCliente != null)
 		{
-			if ((infoCliente.getBloqueado() || (infoCliente.getSaldo() != 0)) && !destruir)
-				return false;
-			else
+			if (destruir || (!infoCliente.getBloqueado() && !(infoCliente.getSaldo() > 0)))
 				this.listaInfoCliente.remove( infoCliente);
+			else
+				return false;
 		}
 		
 		return true;
@@ -521,8 +529,9 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @author Carlos A. Gómez Urda
 	 * @version 1.0
 	 */
-	private class InfoMusica implements ObjetoBD
+	private class InfoMusica implements Serializable, ObjetoBD 
 	{
+		private static final long serialVersionUID = 1L;
 		private Integer idMusica;   // Id del objeto Musica
 		private Integer stock;   	// Número de productos idMusica disponibles en stock.
 		private float precio;       // Precio del producto en la Tienda.
@@ -648,8 +657,9 @@ public class Tienda implements Serializable, ObjetoBD
 	 * @author Carlos A. Gómez Urda
 	 * @version 1.0
 	 */
-	private class InfoCliente implements ObjetoBD
+	private class InfoCliente implements Serializable, ObjetoBD
 	{
+		private static final long serialVersionUID = 1L;
 		private Integer idCliente;      // Id del objeto Cliente.
 		private float saldo;        // Dinero disponible por el cliente en la tienda.
 		private boolean bloqueado;  // Flag para saber si la cuenta está bloqueada.

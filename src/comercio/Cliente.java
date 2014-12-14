@@ -55,6 +55,8 @@ public class Cliente implements Serializable, ObjetoBD
 			throws FileNotFoundException, IOException, ClassNotFoundException
 	{
 		Cliente.lista = BD.leerObjetos( nombreArchivo);
+		int sizeLista = Cliente.lista.size();
+		Cliente.idGeneral = (sizeLista == 0) ? 1 : (Cliente.lista.get( sizeLista-1).id + 1);
 	}
 	
 	
@@ -136,7 +138,7 @@ public class Cliente implements Serializable, ObjetoBD
 		
 		boolean eliminado = true;  // Flag para saber si se ha eliminado toda la información del Cliente en las tiendas. 
 		while (iterator.hasNext())
-			 if ((iterator.next().eliminarMusica( id, destruir) == false) && eliminado)
+			 if ((iterator.next().eliminarCuentaCliente( id, destruir) == false) && eliminado)
 				 eliminado = false;
 		
 		if (eliminado)

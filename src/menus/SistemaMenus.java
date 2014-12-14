@@ -238,11 +238,12 @@ public class SistemaMenus
 	
 	/**
 	 * Devuelve el nombre de la opción con indiceLocal dentro del menú de la opción actual.
-	 * @return Nombre de la opción.
+	 * @return Nombre de la opción. Null si no existe la opción con indiceLocal.
+	 * @throws IndexOutOfBoundsException Si no existe opcion con el índice local. 
 	 */
-	public String obtenerNombre( int indiceLocal)
+	public String obtenerNombre( int indiceLocal) throws NoExisteMenuExcepcion
 	{
-		return opcionActual.obtenerOpcionHija( indiceLocal).getNombre();
+		return this.opcionActual.obtenerOpcionHija( indiceLocal).getNombre();
 	}
 	
 	

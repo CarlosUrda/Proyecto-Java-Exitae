@@ -23,7 +23,7 @@ public class Casete extends Musica
 	 * @param precio Precio base del Casete.
 	 * @throws ObjetoExisteExcepcion Si ya existe un Casete con estos datos
 	 */
-	public static void registrar( String nombre, String codigo, float precio) throws ObjetoExisteExcepcion
+	public static Casete registrar( String nombre, String codigo, float precio) throws ObjetoExisteExcepcion
 	{
 		// Se comprueba si el cliente ya existe
 		Casete casete = new Casete( nombre, codigo, precio);
@@ -31,6 +31,7 @@ public class Casete extends Musica
 			throw new ObjetoExisteExcepcion( "Ya existe un Casete con estos datos."); 
 		
 		Musica.lista.add( casete);
+		return casete;
 	}
 	
 	

@@ -23,7 +23,7 @@ public class Vinilo extends Musica
 	 * @param precio Precio base del Vinilo.
 	 * @throws ObjetoExisteExcepcion Si ya existe un Vinilo con estos datos
 	 */
-	public static void registrar( String nombre, String codigo, float precio) throws ObjetoExisteExcepcion
+	public static Vinilo registrar( String nombre, String codigo, float precio) throws ObjetoExisteExcepcion
 	{
 		// Se comprueba si el cliente ya existe
 		Vinilo vinilo = new Vinilo( nombre, codigo, precio);
@@ -31,6 +31,7 @@ public class Vinilo extends Musica
 			throw new ObjetoExisteExcepcion( "Ya existe un Vinilo con estos datos."); 
 		
 		Musica.lista.add( vinilo);
+		return vinilo;
 	}
 	
 	
