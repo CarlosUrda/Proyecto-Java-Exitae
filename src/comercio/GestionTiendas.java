@@ -664,6 +664,7 @@ public class GestionTiendas
 			System.out.println();
 			System.out.println( "Posibles instrucciones:");
 			System.out.println( "- listar tiendas|clientes|musicas");
+			System.out.println( "- listar ventas idTienda");
 			System.out.println( "- registrar tienda|cliente|cd|casete|vinilo");
 			System.out.println( "- editar tienda|cliente|musica");
 			System.out.println( "- eliminar tienda|cliente|musica");
@@ -671,139 +672,158 @@ public class GestionTiendas
 			System.out.println( "- salir");
 			System.out.println();
 			System.out.println( "Esperando instrucción: ");
-			String[] comandos = scanner.nextLine().split(" ");
-			switch (comandos[0].toLowerCase())
+			String[] comandos = scanner.nextLine().split("\\s+");
+
+			try
 			{
-				case "listar":
-					switch (comandos[1])
-					{
-						case "tiendas":
-							GestionTiendas.listarTiendas();
-							break;
-	
-						case "clientes":
-							GestionTiendas.listarClientes();
-							break;
-							
-						case "musicas":
-							GestionTiendas.listarMusicas();
-							break;
-	
-						default:
-							System.out.println( "No existe la instrucción");
-							break;
-					}
-					break;
-				
-				case "registrar":
-					switch (comandos[1])
-					{
-						case "tienda":
-							GestionTiendas.registrarTienda();
-							break;
-	
-						case "cliente":
-							GestionTiendas.registrarCliente();
-							break;
-							
-						case "cd":
-							GestionTiendas.registrarCD();
-							break;
-	
-						case "casete":
-							GestionTiendas.registrarCasete();
-							break;
-	
-						case "Vinilo":
-							GestionTiendas.registrarVinilo();
-							break;
-	
-						default:
-							System.out.println( "No existe la instrucción");
-							break;
-					}
-					break;
-				
-				case "eliminar":
-					switch (comandos[1])
-					{
-						case "tienda":
-							GestionTiendas.eliminarTienda();
-							break;
-	
-						case "cliente":
-							GestionTiendas.eliminarCliente();
-							break;
-							
-						case "musica":
-							GestionTiendas.eliminarMusica();
-							break;
-	
-						default:
-							System.out.println( "No existe la instrucción");
-							break;
-					}
-					break;
-				
-				case "editar":
-					switch (comandos[1])
-					{
-						case "tienda":
-							GestionTiendas.editarTienda();
-							break;
-	
-						case "cliente":
-							GestionTiendas.editarCliente();
-							break;
-							
-						case "musica":
-							GestionTiendas.editarMusica();
-							break;
-	
-						default:
-							System.out.println( "No existe la instrucción");
-							break;
-					}
-					break;
-				
-				case "gestionar":
-					Tienda tienda = Tienda.buscar( Integer.parseInt( comandos[2]));
-					if (tienda == null)
-					{
-						System.out.println( "La tienda no existe");
+				switch (comandos[0].toLowerCase())
+				{
+					case "listar":
+						switch (comandos[1].toLowerCase())
+						{
+							case "tiendas":
+								GestionTiendas.listarTiendas();
+								break;
+		
+							case "clientes":
+								GestionTiendas.listarClientes();
+								break;
+								
+							case "musicas":
+								GestionTiendas.listarMusicas();
+								break;
+		
+							case "ventas":
+								Tienda tienda = Tienda.buscar( Integer.parseInt( comandos[2]));
+								if (tienda == null)
+								{
+									System.out.println( "La tienda no existe.");
+									break;
+								}
+								System.out.println( "- Listado de Ventas -");
+								tienda.mostrarVentas();
+								break;
+		
+							default:
+								System.out.println( "No existe la instrucción");
+								break;
+						}
 						break;
-					}
-					switch (comandos[1])
-					{
-						case "venta":
-							GestionTiendas.realizarVenta( tienda);
-							break;
-	
-						case "stock":
-							GestionTiendas.gestionarStock( tienda);
-							break;
-							
-						case "saldo":
-							GestionTiendas.gestionarSaldo( tienda);
-							break;
-	
-						case "precio":
-							GestionTiendas.gestionarPrecio( tienda);
-							break;
-	
-						default:
-							System.out.println( "No existe la instrucción");
-							break;
-					}
-					break;
-				
-				case "salir":
-					salir = true;
-					break;
 					
-				default:
-					System.out.println( "No existe la instrucción");
-					break;
+					case "registrar":
+						switch (comandos[1].toLowerCase())
+						{
+							case "tienda":
+								GestionTiendas.registrarTienda();
+								break;
+		
+							case "cliente":
+								GestionTiendas.registrarCliente();
+								break;
+								
+							case "cd":
+								GestionTiendas.registrarCD();
+								break;
+		
+							case "casete":
+								GestionTiendas.registrarCasete();
+								break;
+		
+							case "vinilo":
+								GestionTiendas.registrarVinilo();
+								break;
+		
+							default:
+								System.out.println( "No existe la instrucción.");
+								break;
+						}
+						break;
+					
+					case "eliminar":
+						switch (comandos[1].toLowerCase())
+						{
+							case "tienda":
+								GestionTiendas.eliminarTienda();
+								break;
+		
+							case "cliente":
+								GestionTiendas.eliminarCliente();
+								break;
+								
+							case "musica":
+								GestionTiendas.eliminarMusica();
+								break;
+		
+							default:
+								System.out.println( "No existe la instrucción");
+								break;
+						}
+						break;
+					
+					case "editar":
+						switch (comandos[1].toLowerCase())
+						{
+							case "tienda":
+								GestionTiendas.editarTienda();
+								break;
+		
+							case "cliente":
+								GestionTiendas.editarCliente();
+								break;
+								
+							case "musica":
+								GestionTiendas.editarMusica();
+								break;
+		
+							default:
+								System.out.println( "No existe la instrucción.");
+								break;
+						}
+						break;
+					
+					case "gestionar":
+						Tienda tienda = Tienda.buscar( Integer.parseInt( comandos[2]));
+						if (tienda == null)
+						{
+							System.out.println( "La tienda no existe.");
+							break;
+						}
+						switch (comandos[1].toLowerCase())
+						{
+							case "venta":
+								GestionTiendas.realizarVenta( tienda);
+								break;
+		
+							case "stock":
+								GestionTiendas.gestionarStock( tienda);
+								break;
+								
+							case "saldo":
+								GestionTiendas.gestionarSaldo( tienda);
+								break;
+		
+							case "precio":
+								GestionTiendas.gestionarPrecio( tienda);
+								break;
+		
+							default:
+								System.out.println( "No existe la instrucción.");
+								break;
+						}
+						break;
+					
+					case "salir":
+						salir = true;
+						break;
+						
+					default:
+						System.out.println( "No existe la instrucción.");
+						break;
+				}
+			}
+			catch (Exception e)
+			{
+				System.out.println( "No existe la instrucción.");				
 			}
 		} while (!salir);
 	}
@@ -862,6 +882,7 @@ public class GestionTiendas
 				}				
 			} while (!salirPregunta);
 			
+			System.out.println();
 			switch (nombreMenu)
 			{
 				case "RegistrarTienda":	
@@ -959,6 +980,7 @@ public class GestionTiendas
 					break;
 					
 				case "ListarVentas":
+					System.out.println( "- Listado de Ventas -");
 					tiendaAdmin.mostrarVentas();
 					break;
 

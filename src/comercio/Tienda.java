@@ -864,7 +864,7 @@ class Venta implements Serializable, ObjetoBD
 	{
 		System.out.println( "Id: " + this.id + "; Id Cliente: " + this.idCliente + "; Id Musica: " + 
 							this.idMusica +	"; Núm Productos: " + this.numProductos + "; Precio total: " +
-							this.getGasto() + "; Fecha: " + this.fecha);
+							this.getGasto() + "; Fecha: " + this.fecha.getTime().toString());
 	}
 
 
