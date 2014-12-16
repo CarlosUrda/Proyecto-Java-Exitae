@@ -35,17 +35,28 @@ public class BD
 	 */
 	public static <T> ArrayList<T> leerObjetos( String nombreArchivo) throws FileNotFoundException, IOException, ClassNotFoundException
 	{
-		ObjectInputStream archivo = new ObjectInputStream( new FileInputStream( nombreArchivo));
+		ObjectInputStream objectInput;
 		ArrayList<T> lista = new ArrayList<T>();
+		FileInputStream fileInput = new FileInputStream( nombreArchivo);
 		
+		// Se comprueba si ek archivo esá vacío
+		if (fileInput.available() == 0)
+		{
+			fileInput.close();
+			return lista;
+		}
+		
+		objectInput = new ObjectInputStream( fileInput);
+	
 		try
 		{
 			while (true)
-				lista.add( (T)archivo.readObject());
+				lista.add( (T)objectInput.readObject());
 		}
 		catch (EOFException e)
 		{
-			archivo.close();
+			objectInput.close();
+			fileInput.close();
 			return lista;
 		}		
 	}
@@ -65,5 +76,30 @@ s	 * @throws IOException cualquier otro error en la lectura del archivo
 		
 		while (iterator.hasNext())
 			archivo.writeObject( iterator.next());
+		
+		archivo.close();
+	}
+	
+	
+	/**
+	 * Buscar un objeto T con un id determinado dentro de una lista de objetos 
+	 * @param lista Lista de objetos donde buscar. 
+	 * @param id Id del objeto a buscar.
+	 * @return Objeto encontrado. Si no se encuentra devuelve null.
+	 */
+	public static <T> T buscarObjeto( ArrayList<T> lista, Object id)
+	{
+		Iterator<T> iterator = lista.iterator();
+		T objeto;
+		
+		while (iterator.hasNext())
+		{
+			objeto = iterator.next();
+			if (((ObjetoBD) objeto).getId().equals( id))
+				return objeto;
+		}
+		
+		return null;
+		
 	}
 }
